@@ -23,17 +23,18 @@
                     <span class="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">NJK PROPERTY MAGAZINE</span>
                 </div>
                 <div class="flex items-center gap-4" id="nav-auth-cluster">
-                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
     <main id="app-viewport" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-4rem)]">
-        </main>
+    </main>
 
     <script>
         // REPLACE THIS EXPLICITLY WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP LINK
         const API_URL = "https://script.google.com/macros/s/AKfycbwfPzHWJgJZvEoe31aAXhWC9igh8DNi2QRnt6YzbEVplZozFvIKiBXsiwIS4mB_6jQpYw/exec";
+        
         // Global State Engine
         let state = {
             user: null,
@@ -49,6 +50,10 @@
             generateVisitorId();
             if (state.token) {
                 await syncSessionState();
+                // FIX: If token is still valid after sync, set view to dashboard
+                if (state.token) {
+                    state.currentView = "dashboard";
+                }
             }
             renderApp();
         });
@@ -156,7 +161,7 @@
                     <span id="result-counter" class="text-sm font-medium text-slate-500">Loading listings...</span>
                 </div>
                 <div id="portal-listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    </div>
+                </div>
             `;
             await loadPortalData();
         }
@@ -279,6 +284,8 @@
                     localStorage.setItem("name", json.name);
                     state.token = json.token;
                     state.role = json.role;
+                    
+                    // Sync profile data to populate complete state objects before navigation
                     await syncSessionState();
                     navigateTo("dashboard");
                 } else {
@@ -362,7 +369,6 @@
                 
                 let p = json.data;
                 
-                // Save locally to mark instantly as watched dynamically inside current browser state context
                 let watchedRegistry = JSON.parse(localStorage.getItem("watched_registry") || "[]");
                 if(!watchedRegistry.includes(p.id)) {
                     watchedRegistry.push(p.id);
@@ -453,7 +459,12 @@
             try {
                 let res = await fetch(`${API_URL}?action=dashboard&token=${state.token}`);
                 let json = await res.json();
-                if (!json.success) { forceLogout(); return; }
+                
+                // FIX: Fallback check in case backend data is temporarily unauthorized/empty without wiping user token instantly
+                if (!json.success) { 
+                    target.innerHTML = `<div class="p-8 text-center"><p class="text-red-500 font-medium mb-4">Dashboard pipeline access rejected: ${json.error || 'Unauthorized context'}</p><button onclick="forceLogout()" class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg uppercase">Return to Safety</button></div>`;
+                    return; 
+                }
                 
                 let ov = json.overview;
                 let posts = json.posts;
@@ -546,7 +557,7 @@
                                 <h3 class="font-bold text-slate-900 mb-1">Purchase Standard Deal Modules</h3>
                                 <p class="text-xs text-slate-400 mb-4">Instant system allocation packages.</p>
                                 <div id="deals-injection-target" class="space-y-3">
-                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -622,7 +633,6 @@
             let level = prompt("Select Visibility Boost Tier:\n- Titanium (Costs 10 units, 30 days)\n- Super Hot (Costs 7 units, 30 days)\n- Hot (Costs 5 units, 30 days)\n- Normal (Costs 1 unit, 24 hours)", "Normal");
             if(!level) return;
             
-            // Standardizing strings capitalization safely
             let formatted = level.trim().replace(/\b\w/g, c => c.toUpperCase());
             if(!["Titanium", "Super Hot", "Hot", "Normal"].includes(formatted)) {
                 alert("Validation Fault: Selected parameter does not align with core structural metrics.");
