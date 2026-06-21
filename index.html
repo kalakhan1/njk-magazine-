@@ -845,12 +845,82 @@
                                             <th class="px-6 py-3">Order ID</th>
                                             <th class="px-6 py-3">Deal Node</th>
                                             <th class="px-6 py-3">Agent Node</th>
+async function renderAdminDashboard(target) {
+            target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Opening master administrative streams...</div>`;
+            
+            try {
+                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${state.token}`);
+                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${state.token}`);
+                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${state.token}`);
+                
+                let users = await uRes.json();
+                let quotas = await qRes.json();
+                let deals = await dRes.json();
+
+                // Backend Error Responses Validation
+                if (users.success === false) { alert("Users Sync Error: " + users.error); }
+                if (quotas.success === false) { alert("Quotas Sync Error: " + quotas.error); }
+                if (deals.success === false) { alert("Deals Sync Error: " + deals.error); }
+
+                // Safe fallback arrays to prevent system compilation crash (.filter / .map failures)
+                let usersList = Array.isArray(users.data) ? users.data : [];
+                let quotasList = Array.isArray(quotas.data) ? quotas.data : [];
+                let dealsList = Array.isArray(deals.data) ? deals.data : [];
+                
+                target.innerHTML = `
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Root Administrator Core</h1>
+                        <p class="text-slate-500 text-sm">System management interface across multi-tenant database layers.</p>
+                    </div>
+
+                    <div class="space-y-12">
+                        <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+                            <div class="px-6 py-4 bg-slate-900 text-white font-bold text-sm tracking-wide uppercase">Pending Agent Pipe Quota Demands</div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-slate-600">
+                                    <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-3">Req ID</th>
+                                            <th class="px-6 py-3">Agent</th>
+                                            <th class="px-6 py-3">Demands</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3 text-right">Processing Command Line</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${quotasList.filter(q => q.status === 'pending').map(q => `
+                                            <tr>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${q.id}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-900">${q.user_id}</td>
+                                                <td class="px-6 py-4">Posts: +${q.requested_posts} | Boosts: +${q.requested_refresh}</td>
+                                                <td class="px-6 py-4"><span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">PENDING</span></td>
+                                                <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+                                                    <button onclick="processAdminQuota('${q.id}', 'accepted')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-emerald-700 transition">Approve</button>
+                                                    <button onclick="processAdminQuota('${q.id}', 'rejected')" class="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-red-700 transition">Deny</button>
+                                                </td>
+                                            </tr>
+                                        `).join("")}
+                                        ${quotasList.filter(q => q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+                            <div class="px-6 py-4 bg-slate-900 text-white font-bold text-sm tracking-wide uppercase">Transactional Premium Deal Demands Ledger</div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-slate-600">
+                                    <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-3">Order ID</th>
+                                            <th class="px-6 py-3">Deal Node</th>
+                                            <th class="px-6 py-3">Agent Node</th>
                                             <th class="px-6 py-3">Status</th>
                                             <th class="px-6 py-3 text-right">Execution</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${deals.data.filter(d => d.status === 'pending').map(d => `
+                                        ${dealsList.filter(d => d.status === 'pending').map(d => `
                                             <tr>
                                                 <td class="px-6 py-4 font-mono font-bold text-xs">${d.id}</td>
                                                 <td class="px-6 py-4 font-medium text-slate-900">${d.deal_id}</td>
@@ -862,7 +932,7 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${deals.data.filter(d => d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
+                                        ${dealsList.filter(d => d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -885,7 +955,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${users.data.map(u => `
+                                        ${usersList.map(u => `
                                             <tr>
                                                 <td class="px-6 py-4 font-mono font-bold text-xs">${u.id}</td>
                                                 <td class="px-6 py-4">
@@ -901,15 +971,18 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
+                                        ${usersList.length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No users found in database layer.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 `;
-            } catch(e) { target.innerHTML = `<div class="p-8 text-red-500 text-center">Root administrative visualization compilation fault.</div>`; }
+            } catch(e) { 
+                console.error(e);
+                target.innerHTML = `<div class="p-8 text-red-500 text-center">Root administrative visualization compilation fault.</div>`; 
+            }
         }
-
         async function processAdminQuota(id, status) {
             let note = prompt("Attach operational processing signature administrative note:");
             try {
