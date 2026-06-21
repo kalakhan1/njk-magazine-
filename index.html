@@ -74,7 +74,6 @@
                     localStorage.setItem("role", json.data.role);
                     localStorage.setItem("name", json.data.name);
                 } else {
-                    // Agar profile call manual fail ho jaye, tabhi clear karein
                     forceLogout();
                 }
             } catch(e) {
@@ -274,14 +273,12 @@
             const errNode = document.getElementById("login-err");
             
             try {
-                // Apps script parameters ko serialization pattern ke mutabiq object pass karna secure hai
                 let res = await fetch(`${API_URL}?action=login`, {
                     method: "POST",
                     body: JSON.stringify({ email, password })
                 });
                 let json = await res.json();
                 if (json.success) {
-                    // FIX: Direct assignment of verified identity token and state properties
                     state.token = json.token;
                     state.role = json.role;
                     state.user = { name: json.name, role: json.role, email: email };
@@ -290,7 +287,6 @@
                     localStorage.setItem("role", json.role);
                     localStorage.setItem("name", json.name);
                     
-                    // Direct dashboard par navigate karein, token sync flow bypass karke taaki redundant crash na ho
                     navigateTo("dashboard");
                 } else {
                     errNode.innerText = json.error;
@@ -808,6 +804,11 @@
                 let quotas = await qRes.json();
                 let deals = await dRes.json();
                 
+                // Crash-proofing fallback structures setup
+                let usersList = (users && users.data) ? users.data : [];
+                let quotasList = (quotas && quotas.data) ? quotas.data : [];
+                let dealsList = (deals && deals.data) ? deals.data : [];
+                
                 target.innerHTML = `
                     <div class="mb-8">
                         <h1 class="text-3xl font-black text-slate-900 tracking-tight">Root Administrator Core</h1>
@@ -829,11 +830,11 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${quotas.data.filter(q => q.status === 'pending').map(q => `
+                                        ${quotasList.filter(q => q && q.status === 'pending').map(q => `
                                             <tr>
-                                                <td class="px-6 py-4 font-mono font-bold text-xs">${q.id}</td>
-                                                <td class="px-6 py-4 font-medium text-slate-900">${q.user_id}</td>
-                                                <td class="px-6 py-4">Posts: +${q.requested_posts} | Boosts: +${q.requested_refresh}</td>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${q.id || 'N/A'}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-900">${q.user_id || 'Unknown'}</td>
+                                                <td class="px-6 py-4">Posts: +${q.requested_posts || 0} | Boosts: +${q.requested_refresh || 0}</td>
                                                 <td class="px-6 py-4"><span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">PENDING</span></td>
                                                 <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
                                                     <button onclick="processAdminQuota('${q.id}', 'accepted')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-emerald-700 transition">Approve</button>
@@ -841,7 +842,7 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${quotas.data.filter(q => q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
+                                        ${quotasList.filter(q => q && q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -861,11 +862,11 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${deals.data.filter(d => d.status === 'pending').map(d => `
+                                        ${dealsList.filter(d => d && d.status === 'pending').map(d => `
                                             <tr>
-                                                <td class="px-6 py-4 font-mono font-bold text-xs">${d.id}</td>
-                                                <td class="px-6 py-4 font-medium text-slate-900">${d.deal_id}</td>
-                                                <td class="px-6 py-4">${d.user_id}</td>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${d.id || 'N/A'}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-900">${d.deal_id || 'N/A'}</td>
+                                                <td class="px-6 py-4">${d.user_id || 'Unknown'}</td>
                                                 <td class="px-6 py-4"><span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">PENDING</span></td>
                                                 <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
                                                     <button onclick="processAdminDeal('${d.id}', 'accepted')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-emerald-700 transition">Confirm Payment</button>
@@ -873,7 +874,7 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${deals.data.filter(d => d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
+                                        ${dealsList.filter(d => d && d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -896,29 +897,43 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${users.data.map(u => `
-                                            <tr>
-                                                <td class="px-6 py-4 font-mono font-bold text-xs">${u.id}</td>
-                                                <td class="px-6 py-4">
-                                                    <div class="font-bold text-slate-900">${u.name}</div>
-                                                    <div class="text-xs text-slate-400">${u.email}</div>
-                                                </td>
-                                                <td class="px-6 py-4 font-semibold text-slate-800 uppercase text-xs tracking-wider">${u.role}</td>
-                                                <td class="px-6 py-4 font-medium text-slate-700">Posts: ${u.assigned_post_quota} | Boosts: ${u.assigned_refresh_quota}</td>
-                                                <td class="px-6 py-4">
-                                                    <span class="text-xs font-bold px-2 py-0.5 rounded ${u.active === true || u.active === 'TRUE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
-                                                        ${u.active === true || u.active === 'TRUE' ? 'ACTIVE' : 'DEACTIVATED'}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        `).join("")}
+                                        ${usersList.map(u => {
+                                            if (!u) return '';
+                                            return `
+                                                <tr>
+                                                    <td class="px-6 py-4 font-mono font-bold text-xs">${u.id || 'N/A'}</td>
+                                                    <td class="px-6 py-4">
+                                                        <div class="font-bold text-slate-900">${u.name || 'Unnamed'}</div>
+                                                        <div class="text-xs text-slate-400">${u.email || ''}</div>
+                                                    </td>
+                                                    <td class="px-6 py-4 font-semibold text-slate-800 uppercase text-xs tracking-wider">${u.role || 'Agent'}</td>
+                                                    <td class="px-6 py-4 font-medium text-slate-700">Posts: ${u.assigned_post_quota ?? 0} | Boosts: ${u.assigned_refresh_quota ?? 0}</td>
+                                                    <td class="px-6 py-4">
+                                                        <span class="text-xs font-bold px-2 py-0.5 rounded ${u.active === true || u.active === 'TRUE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+                                                            ${u.active === true || u.active === 'TRUE' ? 'ACTIVE' : 'DEACTIVATED'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join("")}
+                                        ${usersList.length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No user nodes detected in central directory.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 `;
-            } catch(e) { target.innerHTML = `<div class="p-8 text-red-500 text-center">Root administrative visualization compilation fault.</div>`; }
+            } catch(e) { 
+                console.error("Critical Exception in Admin Dashboard Layer Architecture:", e);
+                target.innerHTML = `
+                    <div class="p-8 text-red-500 text-center max-w-md mx-auto bg-red-50 border border-red-200 rounded-xl mt-12 shadow-xs">
+                        <i class="fa-solid fa-triangle-exclamation text-3xl mb-3"></i>
+                        <p class="font-bold">Root administrative visualization compilation fault.</p>
+                        <p class="text-xs text-red-400 mt-1">Please inspect browser console arrays to trace JSON structural anomalies.</p>
+                        <button onclick="navigateTo('portal')" class="mt-4 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg uppercase tracking-wider transition">Back to Main Catalog</button>
+                    </div>
+                `; 
+            }
         }
 
         async function processAdminQuota(id, status) {
