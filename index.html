@@ -66,7 +66,7 @@
         async function syncSessionState() {
             if (!state.token) return;
             try {
-                let res = await fetch(`${API_URL}?action=profile&token=${state.token}`);
+                let res = await fetch(`${API_URL}?action=profile&token=${encodeURIComponent(state.token)}`);
                 let json = await res.json();
                 if (json.success) {
                     state.user = json.data;
@@ -74,6 +74,7 @@
                     localStorage.setItem("role", json.data.role);
                     localStorage.setItem("name", json.data.name);
                 } else {
+                    // Agar profile call manual fail ho jaye, tabhi clear karein
                     forceLogout();
                 }
             } catch(e) {
@@ -273,22 +274,23 @@
             const errNode = document.getElementById("login-err");
             
             try {
+                // Apps script parameters ko serialization pattern ke mutabiq object pass karna secure hai
                 let res = await fetch(`${API_URL}?action=login`, {
                     method: "POST",
                     body: JSON.stringify({ email, password })
                 });
                 let json = await res.json();
                 if (json.success) {
-                    // FIX: State parameters ko synchronous mapping ke mutabiq pehle assign karna zaroori hai
+                    // FIX: Direct assignment of verified identity token and state properties
                     state.token = json.token;
                     state.role = json.role;
+                    state.user = { name: json.name, role: json.role, email: email };
                     
                     localStorage.setItem("token", json.token);
                     localStorage.setItem("role", json.role);
                     localStorage.setItem("name", json.name);
                     
-                    // Profile details sync karein bina context crash kiye
-                    await syncSessionState();
+                    // Direct dashboard par navigate karein, token sync flow bypass karke taaki redundant crash na ho
                     navigateTo("dashboard");
                 } else {
                     errNode.innerText = json.error;
@@ -459,7 +461,7 @@
             target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Syncing user operational profiles...</div>`;
             
             try {
-                let res = await fetch(`${API_URL}?action=dashboard&token=${state.token}`);
+                let res = await fetch(`${API_URL}?action=dashboard&token=${encodeURIComponent(state.token)}`);
                 let json = await res.json();
                 
                 if (!json.success) { 
@@ -572,7 +574,7 @@
         async function loadAgentDealsContext() {
             const container = document.getElementById("deals-injection-target");
             try {
-                let res = await fetch(`${API_URL}?action=getDeals&token=${state.token}`);
+                let res = await fetch(`${API_URL}?action=getDeals&token=${encodeURIComponent(state.token)}`);
                 let json = await res.json();
                 if(json.success) {
                     let activeDeals = json.data.filter(d => d.active === true || d.active === "TRUE");
@@ -596,7 +598,7 @@
             let requested_posts = document.getElementById("req-p-val").value;
             let requested_refresh = document.getElementById("req-r-val").value;
             try {
-                let res = await fetch(`${API_URL}?action=quotaRequest&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=quotaRequest&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ requested_posts, requested_refresh })
                 });
@@ -610,7 +612,7 @@
 
         async function executeDealPurchase(dealId) {
             try {
-                let res = await fetch(`${API_URL}?action=dealRequest&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=dealRequest&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ deal_id: dealId })
                 });
@@ -624,7 +626,7 @@
         async function executeDeletePost(id) {
             if(!confirm("Are you sure you want to delete this listing from the active index matrix?")) return;
             try {
-                let res = await fetch(`${API_URL}?action=posts&_method=DELETE&id=${id}&token=${state.token}`, { method: "POST" });
+                let res = await fetch(`${API_URL}?action=posts&_method=DELETE&id=${id}&token=${encodeURIComponent(state.token)}`, { method: "POST" });
                 let json = await res.json();
                 if(json.success) { navigateTo("dashboard"); }
             } catch(e) { alert("Deactivation routine timeout."); }
@@ -640,7 +642,7 @@
                 return;
             }
             
-            fetch(`${API_URL}?action=refreshPost&token=${state.token}`, {
+            fetch(`${API_URL}?action=refreshPost&token=${encodeURIComponent(state.token)}`, {
                 method: "POST",
                 body: JSON.stringify({ id, level: formatted })
             }).then(r => r.json()).then(json => {
@@ -718,7 +720,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Washrooms Configuration Count</label>
-                                <input type="number" id="f-baths" value="${isEdit ? post.bathrooms : '0'}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                                <input type="number" id="f-baths" value="${isEdit ? post.baths : '0'}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
                             </div>
                         </div>
 
@@ -798,9 +800,9 @@
             target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Opening master administrative streams...</div>`;
             
             try {
-                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${state.token}`);
-                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${state.token}`);
-                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${state.token}`);
+                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${encodeURIComponent(state.token)}`);
+                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${encodeURIComponent(state.token)}`);
+                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${encodeURIComponent(state.token)}`);
                 
                 let users = await uRes.json();
                 let quotas = await qRes.json();
@@ -922,7 +924,7 @@
         async function processAdminQuota(id, status) {
             let note = prompt("Attach operational processing signature administrative note:");
             try {
-                let res = await fetch(`${API_URL}?action=adminProcessQuota&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=adminProcessQuota&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ id, status, admin_note: note })
                 });
@@ -934,7 +936,7 @@
         async function processAdminDeal(id, status) {
             let note = prompt("Attach transactional balance verification note:");
             try {
-                let res = await fetch(`${API_URL}?action=adminProcessDeal&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=adminProcessDeal&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ id, status, admin_note: note })
                 });
@@ -949,7 +951,7 @@
             let assigned_post_quota = prompt("Set total maximum post allocation value:", "5");
             let assigned_refresh_quota = prompt("Set total visibility refresh pool balance:", "20");
             
-            fetch(`${API_URL}?action=adminManualQuota&token=${state.token}`, {
+            fetch(`${API_URL}?action=adminManualQuota&token=${encodeURIComponent(state.token)}`, {
                 method: "POST",
                 body: JSON.stringify({ user_id, assigned_post_quota, assigned_refresh_quota })
             }).then(r=>r.json()).then(json => {
