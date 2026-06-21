@@ -1,630 +1,949 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NJK Property Magazine - Portal</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .lang-ur { font-family: 'Noto Nastaliq Urdu', serif; line-height: 2.5; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NJK Property Magazine</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .badge-titanium { background: linear-gradient(135deg, #708090, #1a1a1a); color: #fff; }
+        .badge-superhot { background: linear-gradient(135deg, #ff4500, #ff8c00); color: #fff; }
+        .badge-hot { background: linear-gradient(135deg, #ff8c00, #ffd700); color: #fff; }
+        .badge-normal { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 transition-all duration-300">
+<body class="bg-slate-50 font-sans text-slate-800 antialiased">
 
-  <header class="bg-gradient-to-r bg-blue-700 to-indigo-800 text-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-3">
-      <div class="flex items-center space-x-3">
-        <span class="font-bold text-xl tracking-wide data-translate" data-en="NJK Property Magazine" data-ur="این جے کے پراپرٹی میگزین">NJK Property Magazine</span>
-      </div>
-      <div class="flex items-center space-x-4">
-        <button id="langToggleBtn" class="bg-white/20 hover:bg-white/30 text-white font-medium py-1.5 px-4 rounded-lg transition text-sm cursor-pointer border border-white/10 shadow-sm">
-          اردو / English
-        </button>
-        <span id="userSessionBadge" class="hidden text-xs bg-indigo-900/40 px-3 py-1.5 rounded-md border border-indigo-400/20 font-mono"></span>
-        <button id="logoutBtn" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-semibold py-1.5 px-4 rounded-lg transition text-sm cursor-pointer shadow-md data-translate" data-en="Log Out" data-ur="لاگ آؤٹ">Log Out</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <div id="alertBox" class="hidden mb-6 p-4 rounded-xl border transition-all shadow-md transform scale-95 duration-200"></div>
-
-    <section id="authView" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-300 mt-10">
-      <div class="bg-slate-100 p-4 flex justify-around border-b border-slate-200/60">
-        <button id="switchLoginTab" class="w-1/2 py-2 text-center font-bold text-blue-700 border-b-2 border-blue-600 data-translate" data-en="Sign In" data-ur="لاگ ان">Sign In</button>
-        <button id="switchRegisterTab" class="w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800 data-translate" data-en="Create Account" data-ur="رجسٹریشن">Create Account</button>
-      </div>
-      <div class="p-8">
-        <form id="authForm" class="space-y-5">
-          <div id="nameFieldGroup" class="hidden">
-            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Full Name" data-ur="مکمل نام">Full Name</label>
-            <input type="text" id="authName" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Email Address" data-ur="ای میل ایڈریس">Email Address</label>
-            <input type="email" id="authEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50" placeholder="agent@njkmagazine.com">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Password" data-ur="پاس ورڈ">Password</label>
-            <input type="password" id="authPassword" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50" placeholder="••••••••">
-          </div>
-          <button type="submit" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition transform active:scale-95 cursor-pointer mt-2 data-translate" data-en="Authenticate System Access" data-ur="سسٹم تک رسائی حاصل کریں">Authenticate System Access</button>
-        </form>
-      </div>
-    </section>
-
-    <section id="dashboardView" class="hidden space-y-8 animate-fadeIn">
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
-          <div class="p-3.5 bg-blue-50 rounded-xl text-blue-600 text-2xl font-bold">P</div>
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Available Listing Quota" data-ur="دستیاب لسٹنگ کوٹہ">Available Listing Quota</p>
-            <h3 id="quotaPostVal" class="text-3xl font-bold text-slate-800">0</h3>
-          </div>
+    <nav class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('portal')">
+                    <i class="fa-solid fa-building-shield text-indigo-600 text-2xl"></i>
+                    <span class="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">NJK PROPERTY MAGAZINE</span>
+                </div>
+                <div class="flex items-center gap-4" id="nav-auth-cluster">
+                    </div>
+            </div>
         </div>
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
-          <div class="p-3.5 bg-indigo-50 rounded-xl text-indigo-600 text-2xl font-bold">R</div>
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Refresh Token Points" data-ur="ریفریش ٹوکن پوائنٹس">Refresh Token Points</p>
-            <h3 id="quotaRefreshVal" class="text-3xl font-bold text-slate-800">0</h3>
-          </div>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
-          <div class="p-3.5 bg-slate-50 rounded-xl text-slate-600 text-2xl font-bold">R</div>
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Account Role Context" data-ur="اکاؤنٹ کا درجہ">Account Role Context</p>
-            <h3 id="accountRoleVal" class="text-2xl font-bold text-blue-600">Agent</h3>
-          </div>
-        </div>
-      </div>
+    </nav>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-5 h-fit lg:col-span-1">
-          <h2 class="text-xl font-bold border-b pb-3 text-slate-700 data-translate" data-en="NJK Property Form" data-ur="فارم برائے این جے کے پراپرٹی">NJK Property Form</h2>
-          
-          <form id="propertyForm" class="space-y-4">
-            <div>
-              <label for="title" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Title" data-ur="عنوان">Title</label>
-              <input type="text" id="title" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
+    <main id="app-viewport" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-4rem)]">
+        </main>
 
-            <div>
-              <label for="description" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Description" data-ur="تفصیل">Description</label>
-              <textarea id="description" rows="3" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
-            </div>
+    <script>
+        // REPLACE THIS EXPLICITLY WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP LINK
+        const API_URL = "https://script.google.com/macros/s/AKfycbxXlE1v2ZuSBwKVQA__yDW6p9t0q1mghwZomZq77l736rQjaqDyZygSu7wSjy6bgl6vvg/exec";
 
-            <div>
-              <label for="propertyType" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Property Type" data-ur="پراپرٹی کی قسم">Property Type</label>
-              <select id="propertyType" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                <option value="" disabled selected class="data-translate" data-en="Select Property Type" data-ur="پراپرٹی کی قسم منتخب کریں">Select Property Type</option>
-                <option value="Plot">Plot</option>
-                <option value="Bungalow">Bungalow</option>
-                <option value="Flat">Flat</option>
-                <option value="Shop">Shop</option>
-                <option value="Office">Office</option>
-                <option value="Mezzanine">Mezzanine</option>
-                <option value="Basement">Basement</option>
-                <option value="Building">Building</option>
-                <option value="Factory">Factory</option>
-                <option value="Warehouse">Warehouse</option>
-              </select>
-            </div>
+        // Global State Engine
+        let state = {
+            user: null,
+            token: localStorage.getItem("token") || null,
+            role: localStorage.getItem("role") || null,
+            currentView: "portal",
+            viewData: {},
+            globalListings: []
+        };
 
-            <div>
-              <label for="location" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Location" data-ur="مقام / لوکیشن">Location</label>
-              <select id="location" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                <option value="" disabled selected class="data-translate" data-en="Select Location" data-ur="لوکیشن منتخب کریں">Select Location</option>
-                <option value="DHA Phase">DHA Phase</option>
-                <option value="Clifton Block">Clifton Block</option>
-                <option value="Bahria Town Karachi">Bahria Town Karachi</option>
-                <option value="DHA City Karachi">DHA City Karachi</option>
-                <option value="Korangi Industrial Area">Korangi Industrial Area</option>
-                <option value="Creek Industrial Area">Creek Industrial Area</option>
-                <option value="Landhi Industrial Area">Landhi Industrial Area</option>
-                <option value="Port Qasim">Port Qasim</option>
-                <option value="National Highway">National Highway</option>
-                <option value="Superhighway">Superhighway</option>
-                <option value="Nooriabad">Nooriabad</option>
-                <option value="Site">Site</option>
-                <option value="Site Superhighway Phase">Site Superhighway Phase</option>
-                <option value="Custom Location">Custom Location</option>
-              </select>
-            </div>
-
-            <div id="locationDetailContainer" class="hidden">
-              <label id="locationDetailLabel" for="locationDetail" class="block text-sm font-medium mb-1 text-gray-700">Location Detail</label>
-              <input type="text" id="locationDetail" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-
-            <div>
-              <label for="purpose" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Purpose" data-ur="مقصد">Purpose</label>
-              <select id="purpose" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                <option value="" disabled selected class="data-translate" data-en="Select Purpose" data-ur="مقصد منتخب کریں">Select Purpose</option>
-                <option value="Sale">Sale</option>
-                <option value="Rent">Rent</option>
-              </select>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Area Value" data-ur="رقبے کی ویلیو">Area Value</label>
-                <input type="number" id="areaValue" required min="0" step="any" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Unit" data-ur="یونٹ">Unit</label>
-                <select id="areaUnit" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                  <option value="Sqft">Sqft</option>
-                  <option value="Sqyds">Sqyds</option>
-                  <option value="Acre">Acre</option>
-                </select>
-              </div>
-            </div>
-
-            <div id="bedroomsContainer" class="hidden">
-              <label for="bedrooms" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Bedrooms" data-ur="کمرے">Bedrooms</label>
-              <input type="number" id="bedrooms" min="0" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-
-            <div id="bathroomsContainer" class="hidden">
-              <label for="bathrooms" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Bathrooms" data-ur="باتھ رومز">Bathrooms</label>
-              <input type="number" id="bathrooms" min="0" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-
-            <div>
-              <label for="price" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Price (PKR)" data-ur="قیمت (روپے)">Price (PKR)</label>
-              <input type="number" id="price" required min="0" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-
-            <div>
-              <label for="agentName" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Agent Name" data-ur="ایجنٹ کا نام">Agent Name</label>
-              <input type="text" id="agentName" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-
-            <div>
-              <label for="agencyName" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Agency Name" data-ur="ایجنسی کا نام">Agency Name</label>
-              <input type="text" id="agencyName" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-
-            <div>
-              <label for="contactNumber" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Contact Number" data-ur="رابطہ نمبر">Contact Number</label>
-              <input type="number" id="contactNumber" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            </div>
-
-            <div class="pt-2">
-              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium p-3 rounded-lg transition duration-200 cursor-pointer data-translate" data-en="Submit Property" data-ur="پراپرٹی جمع کریں">
-                Submit Property
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="lg:col-span-2 space-y-6">
-          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-            <h2 class="text-lg font-bold border-b pb-3 mb-4 text-slate-700 data-translate" data-en="Active Catalog Assets Management" data-ur="آپ کی لسٹنگز کا انتظام">Active Catalog Assets Management</h2>
-            <div id="postsContainer" class="space-y-4 max-h-[650px] overflow-y-auto pr-2">
-              </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="bg-slate-900 text-slate-400 py-6 mt-16 border-t border-slate-800 text-center text-xs tracking-wider">
-    <p class="font-mono uppercase">&copy; 2026 REAL ESTATE RECORD SYSTEM AUTOMATION PIPELINE</p>
-    <p class="text-slate-500 mt-1 font-semibold">A PROJECT BY HNK & SHEEKAN TECH AND STUDIO</p>
-  </footer>
-
-  <script>
-    // CORE SCRIPT LINK REGISTRY GATEWAY VALUE
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQOEpgXnlwPoR8ZJBDQ5HSgOonDa8mqwz5U9LWv80oi3FcJHeAngGdHj10FE2RAQwzBw/exec";
-
-    let sysState = {
-      currentLang: "en",
-      activeTab: "login",
-      token: localStorage.getItem("z_system_auth_token") || null,
-      profile: null,
-      listings: []
-    };
-
-    const uiDictionary = {
-      "en": { dir: "ltr" },
-      "ur": { dir: "rtl" }
-    };
-
-    document.addEventListener("DOMContentLoaded", () => {
-      initEventListeners();
-      evaluateGlobalApplicationStateRoute();
-      initNJKFormConditionalLogic();
-    });
-
-    function initEventListeners() {
-      document.getElementById("langToggleBtn").addEventListener("click", () => {
-        sysState.currentLang = sysState.currentLang === "en" ? "ur" : "en";
-        document.documentElement.lang = sysState.currentLang;
-        document.documentElement.dir = uiDictionary[sysState.currentLang].dir;
-        if (sysState.currentLang === "ur") {
-          document.body.classList.add("lang-ur");
-        } else {
-          document.body.classList.remove("lang-ur");
-        }
-        applyUIPhraseTranslationSync();
-      });
-
-      document.getElementById("switchLoginTab").addEventListener("click", () => toggleAuthTabs("login"));
-      document.getElementById("switchRegisterTab").addEventListener("click", () => toggleAuthTabs("register"));
-      document.getElementById("authForm").addEventListener("submit", handleAuthenticationFormTransactionPipeline);
-      document.getElementById("propertyForm").addEventListener("submit", handleListingCreationPipelineCommit);
-      document.getElementById("logoutBtn").addEventListener("click", triggerSystemSessionTeardownClearance);
-    }
-
-    function initNJKFormConditionalLogic() {
-      const propertyTypeSelect = document.getElementById('propertyType');
-      const locationSelect = document.getElementById('location');
-      
-      const bedroomsContainer = document.getElementById('bedroomsContainer');
-      const bedroomsInput = document.getElementById('bedrooms');
-      
-      const bathroomsContainer = document.getElementById('bathroomsContainer');
-      const bathroomsInput = document.getElementById('bathrooms');
-      
-      const locationDetailContainer = document.getElementById('locationDetailContainer');
-      const locationDetailLabel = document.getElementById('locationDetailLabel');
-      const locationDetailInput = document.getElementById('locationDetail');
-
-      // Property Type Change Logic Integration
-      propertyTypeSelect.addEventListener('change', function() {
-        const val = this.value;
-
-        // Bedrooms conditional configuration tracking
-        if (val === 'Flat' || val === 'Bungalow') {
-          bedroomsContainer.classList.remove('hidden');
-          bedroomsInput.setAttribute('required', 'required');
-        } else {
-          bedroomsContainer.classList.add('hidden');
-          bedroomsInput.removeAttribute('required');
-          bedroomsInput.value = '';
-        }
-
-        // Bathrooms conditional configuration tracking
-        const allowedBathrooms = ['Flat', 'Bungalow', 'Shop', 'Office', 'Mezzanine', 'Basement'];
-        if (allowedBathrooms.includes(val)) {
-          bathroomsContainer.classList.remove('hidden');
-          bathroomsInput.setAttribute('required', 'required');
-        } else {
-          bathroomsContainer.classList.add('hidden');
-          bathroomsInput.removeAttribute('required');
-          bathroomsInput.value = '';
-        }
-      });
-
-      // Location Change Logic Integration
-      locationSelect.addEventListener('change', function() {
-        const val = this.value;
-
-        if (!val) {
-          locationDetailContainer.classList.add('hidden');
-          locationDetailInput.removeAttribute('required');
-          locationDetailInput.value = '';
-          return;
-        }
-
-        locationDetailContainer.classList.remove('hidden');
-        locationDetailInput.setAttribute('required', 'required');
-
-        // Dynamic Labels Text Content Context Matrix Map
-        switch (val) {
-          case 'DHA Phase':
-            locationDetailLabel.textContent = 'Enter DHA Phase';
-            break;
-          case 'Clifton Block':
-            locationDetailLabel.textContent = 'Enter Clifton Block';
-            break;
-          case 'Bahria Town Karachi':
-            locationDetailLabel.textContent = 'Enter BTK Precinct';
-            break;
-          case 'DHA City Karachi':
-            locationDetailLabel.textContent = 'Enter DCK Sector';
-            break;
-          case 'Custom Location':
-            locationDetailLabel.textContent = 'Enter Custom Location Name';
-            break;
-          default:
-            locationDetailLabel.textContent = `Enter ${val} Area Detail`;
-            break;
-        }
-      });
-    }
-
-    function applyUIPhraseTranslationSync() {
-      document.querySelectorAll(".data-translate").forEach(el => {
-        const textValue = el.getAttribute(`data-${sysState.currentLang}`);
-        if(textValue) el.textContent = textValue;
-      });
-    }
-
-    function toggleAuthTabs(target) {
-      sysState.activeTab = target;
-      const lTab = document.getElementById("switchLoginTab");
-      const rTab = document.getElementById("switchRegisterTab");
-      const nGroup = document.getElementById("nameFieldGroup");
-      
-      if (target === "login") {
-        lTab.className = "w-1/2 py-2 text-center font-bold text-blue-700 border-b-2 border-blue-600";
-        rTab.className = "w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800";
-        nGroup.classList.add("hidden");
-        document.getElementById("authName").required = false;
-      } else {
-        rTab.className = "w-1/2 py-2 text-center font-bold text-blue-700 border-b-2 border-blue-600";
-        lTab.className = "w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800";
-        nGroup.classList.remove("hidden");
-        document.getElementById("authName").required = true;
-      }
-    }
-
-    function displayMessage(msg, isSuccess = false) {
-      const box = document.getElementById("alertBox");
-      box.className = `p-4 rounded-xl border text-sm font-medium shadow-md transition-all duration-300 transform scale-100 ${
-        isSuccess ? "bg-blue-50 text-blue-800 border-blue-200" : "bg-rose-50 text-rose-800 border-rose-200"
-      }`;
-      box.textContent = msg;
-      box.classList.remove("hidden");
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function clearMessage() {
-      document.getElementById("alertBox").classList.add("hidden");
-    }
-
-    async function evaluateGlobalApplicationStateRoute() {
-      if (!sysState.token) {
-        document.getElementById("authView").classList.remove("hidden");
-        document.getElementById("dashboardView").classList.add("hidden");
-        document.getElementById("logoutBtn").classList.add("hidden");
-        document.getElementById("userSessionBadge").classList.add("hidden");
-        return;
-      }
-
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=profile&method=GET&token=${sysState.token}`);
-        const result = await response.json();
-        
-        if (result.success) {
-          sysState.profile = result.data;
-          renderDashboardWorkspaceLayout();
-        } else {
-          triggerSystemSessionTeardownClearance();
-        }
-      } catch (err) {
-        displayMessage("Fatal Network System Error Connectivity Interface Exception. Confirm backend script runtime rules configurations.");
-      }
-    }
-
-    async function handleAuthenticationFormTransactionPipeline(e) {
-      e.preventDefault();
-      clearMessage();
-      
-      const payload = {
-        email: document.getElementById("authEmail").value.trim(),
-        password: document.getElementById("authPassword").value
-      };
-      
-      const targetAction = sysState.activeTab === "login" ? "login" : "register";
-      if (targetAction === "register") {
-        payload.name = document.getElementById("authName").value.trim();
-      }
-
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=${targetAction}&method=POST`, {
-          method: "POST",
-          mode: "cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
+        // Initialize App Context
+        window.addEventListener("DOMContentLoaded", async () => {
+            generateVisitorId();
+            if (state.token) {
+                await syncSessionState();
+            }
+            renderApp();
         });
-        const result = await response.json();
 
-        if (result.success) {
-          if (targetAction === "login") {
-            localStorage.setItem("z_system_auth_token", result.data.token);
-            sysState.token = result.data.token;
-            await evaluateGlobalApplicationStateRoute();
-          } else {
-            displayMessage("Account registration commit finalized. Transitioning authentication gateway channels.", true);
-            toggleAuthTabs("login");
-          }
-        } else {
-          displayMessage(result.error || "Authentication structural parsing processing failure.");
+        function generateVisitorId() {
+            if (!localStorage.getItem("visitor_id")) {
+                localStorage.setItem("visitor_id", "VIS-" + Math.random().toString(36).substr(2, 9).toUpperCase());
+            }
         }
-      } catch (err) {
-        displayMessage("Fatal network pipeline mapping boundary check failed processing transmission.");
-      }
-    }
 
-    function renderDashboardWorkspaceLayout() {
-      document.getElementById("authView").classList.add("hidden");
-      document.getElementById("dashboardView").classList.remove("hidden");
-      document.getElementById("logoutBtn").classList.remove("hidden");
-      
-      const badge = document.getElementById("userSessionBadge");
-      badge.textContent = `ID: ${sysState.profile.id} [${sysState.profile.name}]`;
-      badge.classList.remove("hidden");
-
-      document.getElementById("quotaPostVal").textContent = sysState.profile.assigned_post_quota;
-      document.getElementById("quotaRefreshVal").textContent = sysState.profile.assigned_refresh_quota;
-      document.getElementById("accountRoleVal").textContent = sysState.profile.role;
-
-      fetchAgentCatalogListingsCollection();
-    }
-
-    async function fetchAgentCatalogListingsCollection() {
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=posts&method=GET&token=${sysState.token}`);
-        const result = await response.json();
-        if (result.success) {
-          sysState.listings = result.data;
-          renderListingsCatalogFeedItemsGrid();
+        async function syncSessionState() {
+            try {
+                let res = await fetch(`${API_URL}?action=profile&token=${state.token}`);
+                let json = await res.json();
+                if (json.success) {
+                    state.user = json.data;
+                } else {
+                    forceLogout();
+                }
+            } catch(e) {
+                console.error("Session sync handshake exception occurred: ", e);
+            }
         }
-      } catch (err) {
-        console.error("Internal collection synchronization process context trace fault vectors mapping exception.");
-      }
-    }
 
-    function renderListingsCatalogFeedItemsGrid() {
-      const container = document.getElementById("postsContainer");
-      container.innerHTML = "";
-
-      if(sysState.listings.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-sm text-slate-400 font-medium tracking-wide">No catalog database asset index entries located tracking numbers null.</div>`;
-        return;
-      }
-
-      sysState.listings.forEach(p => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "p-4 border border-slate-100 rounded-xl bg-slate-50/50 hover:bg-slate-50 flex justify-between items-start flex-wrap gap-4 transition shadow-xs";
-        
-        let badgeColor = "bg-slate-100 text-slate-600";
-        if(p.refresh_level === "Hot") badgeColor = "bg-amber-100 text-amber-700 font-semibold";
-        if(p.refresh_level === "Super Hot") badgeColor = "bg-orange-100 text-orange-700 font-bold";
-        if(p.refresh_level === "Titanium") badgeColor = "bg-blue-100 text-blue-700 font-extrabold ring-1 ring-blue-300";
-
-        wrapper.innerHTML = `
-          <div class="space-y-1">
-            <div class="flex items-center space-x-2 flex-wrap gap-1">
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">${p.id}</span>
-              <span class="text-xs font-medium px-2 py-0.5 rounded ${badgeColor}">${p.refresh_level || 'Standard'}</span>
-              <span class="text-xs font-bold text-blue-600 font-mono">${Number(p.price).toLocaleString()} PKR</span>
-            </div>
-            <h4 class="font-bold text-slate-800 text-sm">${p.title}</h4>
-            <p class="text-xs text-slate-500 font-medium">${p.location} (${p.location_detail || 'N/A'}) | ${p.property_type} | ${p.purpose}</p>
-            <p class="text-xs text-slate-400 font-medium">Area: ${p.area} ${p.area_unit} | Beds: ${p.bedrooms || 0} | Baths: ${p.bathrooms || 0}</p>
-            <p class="text-[11px] text-slate-400 font-mono">Agent: ${p.agent_name} [${p.agency_name}]</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <select id="boostTier-${p.id}" class="text-xs border px-2 py-1 rounded bg-white font-medium focus:outline-none">
-              <option value="Hot">Hot (2 pts)</option>
-              <option value="Super Hot">Super Hot (3 pts)</option>
-              <option value="Titanium">Titanium (5 pts)</option>
-            </select>
-            <button onclick="commitListingRefreshActionRequest('${p.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-1 rounded-lg transition shadow-xs cursor-pointer">Refresh</button>
-            <button onclick="triggerListingDeletionPipeline('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs px-2 py-1 rounded-lg transition border border-rose-200/40 cursor-pointer">✕</button>
-          </div>
-        `;
-        container.appendChild(wrapper);
-      });
-    }
-
-    async function handleListingCreationPipelineCommit(e) {
-      e.preventDefault();
-      clearMessage();
-
-      // Mapping 100% inputs parameters matching your form fields
-      const payload = {
-        title: document.getElementById("title").value.trim(),
-        description: document.getElementById("description").value.trim(),
-        property_type: document.getElementById("propertyType").value,
-        location: document.getElementById("location").value,
-        location_detail: document.getElementById("locationDetail").value.trim(),
-        purpose: document.getElementById("purpose").value,
-        price: Number(document.getElementById("price").value),
-        area: Number(document.getElementById("areaValue").value),
-        area_unit: document.getElementById("areaUnit").value,
-        bedrooms: Number(document.getElementById("bedrooms").value) || 0,
-        bathrooms: Number(document.getElementById("bathrooms").value) || 0,
-        agent_name: document.getElementById("agentName").value.trim(),
-        agency_name: document.getElementById("agencyName").value.trim(),
-        contact_number: document.getElementById("contactNumber").value.trim(),
-        token: sysState.token
-      };
-
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=posts&method=POST`, {
-          method: "POST",
-          mode: "cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json();
-
-        if (result.success) {
-          document.getElementById("propertyForm").reset();
-          // Hide dynamic containers manually post reset trigger
-          document.getElementById('bedroomsContainer').classList.add('hidden');
-          document.getElementById('bathroomsContainer').classList.add('hidden');
-          document.getElementById('locationDetailContainer').classList.add('hidden');
-          
-          await evaluateGlobalApplicationStateRoute();
-          displayMessage("NJK Property Magazine asset listing mapped to backend server dataset successfully.", true);
-        } else {
-          displayMessage(result.error || "Execution error processing backend database record injection workflow.");
+        function forceLogout() {
+            localStorage.clear();
+            state.token = null;
+            state.role = null;
+            state.user = null;
+            state.currentView = "portal";
+            renderApp();
         }
-      } catch (err) {
-        displayMessage("Fatal operational context exception boundaries data serialization failure.");
-      }
-    }
 
-    async function commitListingRefreshActionRequest(postId) {
-      clearMessage();
-      const selectedTier = document.getElementById(`boostTier-${postId}`).value;
-      const payload = {
-        post_id: postId,
-        refresh_level: selectedTier,
-        token: sysState.token
-      };
-
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=refresh-post&method=POST`, {
-          method: "POST",
-          mode: "cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json();
-
-        if(result.success) {
-          await evaluateGlobalApplicationStateRoute();
-          displayMessage(`Listing manual refresh level boost sequence applied successfully to target node: ${postId}`, true);
-        } else {
-          displayMessage(result.error || "Boost assignment execution mismatch transaction parameter failure.");
+        function navigateTo(view, data = {}) {
+            state.currentView = view;
+            state.viewData = data;
+            renderApp();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-      } catch (err) {
-        displayMessage("Network transport transmission routing processing verification fault.");
-      }
-    }
 
-    async function triggerListingDeletionPipeline(postId) {
-      if(!confirm("Are you certain you wish to flag this asset row visibility parameter matrix to archived state offline?")) return;
-      clearMessage();
-
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=posts&method=DELETE&id=${postId}&token=${sysState.token}`, {
-          method: "POST"
-        });
-        const result = await response.json();
-
-        if(result.success) {
-          await evaluateGlobalApplicationStateRoute();
-          displayMessage(`Listing row identity entry ${postId} flagged archived offline successfully.`, true);
-        } else {
-          displayMessage(result.error || "Access management visibility modification validation error.");
+        function renderApp() {
+            renderNavbar();
+            const viewport = document.getElementById("app-viewport");
+            
+            switch (state.currentView) {
+                case "portal": return renderPortalView(viewport);
+                case "login": return renderLoginView(viewport);
+                case "register": return renderRegisterView(viewport);
+                case "detail": return renderDetailView(viewport, state.viewData.id);
+                case "dashboard": 
+                    if (state.role === "admin") return renderAdminDashboard(viewport);
+                    return renderAgentDashboard(viewport);
+                case "postForm": return renderPostFormView(viewport, state.viewData.post);
+                default: viewport.innerHTML = `<div class="p-8 text-center text-red-500">Routing Node Collapse Exception</div>`;
+            }
         }
-      } catch (err) {
-        displayMessage("Data channel streaming verification trace fault error processing.");
-      }
-    }
 
-    function triggerSystemSessionTeardownClearance() {
-      localStorage.removeItem("z_system_auth_token");
-      sysState.token = null;
-      sysState.profile = null;
-      sysState.listings = [];
-      clearMessage();
-      evaluateGlobalApplicationStateRoute();
-    }
-  </script>
+        function renderNavbar() {
+            const cluster = document.getElementById("nav-auth-cluster");
+            if (state.token) {
+                cluster.innerHTML = `
+                    <span class="text-sm font-semibold text-slate-600 hidden md:inline">Welcome, ${localStorage.getItem("name") || 'User'}</span>
+                    <button onclick="navigateTo('dashboard')" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-xs hover:bg-indigo-700 transition">Dashboard</button>
+                    <button onclick="forceLogout()" class="p-2 text-slate-400 hover:text-red-500 rounded-lg transition"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                `;
+            } else {
+                cluster.innerHTML = `
+                    <button onclick="navigateTo('login')" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition">Sign In</button>
+                    <button onclick="navigateTo('register')" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-xs hover:bg-indigo-700 transition">Register</button>
+                `;
+            }
+        }
+
+        // ==========================================
+        // VIEW ARCHITECTURES (DOM ENGINE BINDINGS)
+        // ==========================================
+
+        async function renderPortalView(target) {
+            target.innerHTML = `
+                <div class="mb-8 bg-gradient-to-r from-indigo-900 to-slate-900 rounded-2xl p-8 md:p-12 text-white shadow-xl">
+                    <h1 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Find Your Next Premium Address</h1>
+                    <p class="text-slate-300 text-base md:text-lg max-w-2xl mb-8">Real-time marketplace index for elite property listings with programmatic sorting.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white/10 p-4 rounded-xl backdrop-blur-md">
+                        <select id="search-type" class="bg-white border-0 text-slate-800 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500">
+                            <option value="">All Property Types</option>
+                            <option value="House">House</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Plot">Plot</option>
+                            <option value="Commercial">Commercial</option>
+                        </select>
+                        <select id="search-purpose" class="bg-white border-0 text-slate-800 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Any Purpose</option>
+                            <option value="For Sale">For Sale</option>
+                            <option value="For Rent">For Rent</option>
+                        </select>
+                        <input type="text" id="search-loc" placeholder="City or Location..." class="bg-white border-0 text-slate-800 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="executeSearchFilter()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg p-3 text-sm transition shadow-sm">Search Catalog</button>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-slate-900">Verified Database Index</h2>
+                    <span id="result-counter" class="text-sm font-medium text-slate-500">Loading listings...</span>
+                </div>
+                <div id="portal-listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    </div>
+            `;
+            await loadPortalData();
+        }
+
+        async function loadPortalData() {
+            const grid = document.getElementById("portal-listings-grid");
+            try {
+                let res = await fetch(`${API_URL}?action=getPublicPosts`);
+                let json = await res.json();
+                if (json.success) {
+                    state.globalListings = json.data;
+                    renderCards(state.globalListings);
+                }
+            } catch(e) {
+                grid.innerHTML = `<div class="p-4 text-red-500 text-center col-span-3">Network gateway sync failure.</div>`;
+            }
+        }
+
+        function renderCards(items) {
+            const grid = document.getElementById("portal-listings-grid");
+            const counter = document.getElementById("result-counter");
+            counter.innerText = `${items.length} records populated`;
+            
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="p-12 text-slate-400 text-center col-span-3">No active properties match parameters.</div>`;
+                return;
+            }
+            
+            const localWatched = JSON.parse(localStorage.getItem("watched_registry") || "[]");
+
+            grid.innerHTML = items.map(p => {
+                let badgeClass = "badge-normal";
+                if(p.refresh_level === "Titanium") badgeClass = "badge-titanium";
+                if(p.refresh_level === "Super Hot") badgeClass = "badge-superhot";
+                if(p.refresh_level === "Hot") badgeClass = "badge-hot";
+                
+                const isWatched = localWatched.includes(p.id);
+
+                return `
+                    <div class="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-md transition relative flex flex-col cursor-pointer" onclick="navigateTo('detail', {id: '${p.id}'})">
+                        <span class="absolute top-3 right-3 text-[10px] font-black tracking-widest px-2.5 py-1 rounded-sm ${badgeClass}">
+                            ${p.refresh_level.toUpperCase()}
+                        </span>
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex gap-2 items-center text-xs font-bold uppercase tracking-wider text-indigo-600 mb-2">
+                                    <span>${p.property_type}</span>
+                                    <span>•</span>
+                                    <span>${p.purpose}</span>
+                                    ${isWatched ? `<span class="ml-auto bg-slate-100 text-slate-600 text-[9px] px-1.5 py-0.5 rounded border border-slate-200 font-bold tracking-tight">WATCHED</span>` : ''}
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-900 tracking-tight leading-snug mb-1 line-clamp-1">${p.title}</h3>
+                                <p class="text-slate-500 text-xs mb-4 flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> ${p.location}</p>
+                                <div class="flex gap-4 mb-4 text-xs font-medium text-slate-600 bg-slate-50 p-2.5 rounded-lg">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-maximize text-slate-400"></i> ${p.area} ${p.area_unit}</span>
+                                    ${p.bedrooms ? `<span class="flex items-center gap-1"><i class="fa-solid fa-bed text-slate-400"></i> ${p.bedrooms} Beds</span>` : ''}
+                                    ${p.bathrooms ? `<span class="flex items-center gap-1"><i class="fa-solid fa-bath text-slate-400"></i> ${p.bathrooms} Baths</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                                <span class="text-xl font-black text-slate-900">PKR ${Number(p.price).toLocaleString()}</span>
+                                <span class="text-[11px] text-slate-400 font-medium">${p.agency_name || 'Independent'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function executeSearchFilter() {
+            const type = document.getElementById("search-type").value;
+            const purpose = document.getElementById("search-purpose").value;
+            const loc = document.getElementById("search-loc").value.toLowerCase();
+            
+            let filtered = state.globalListings.filter(p => {
+                if (type && p.property_type !== type) return false;
+                if (purpose && p.purpose !== purpose) return false;
+                if (loc && !p.location.toLowerCase().includes(loc) && !p.title.toLowerCase().includes(loc)) return false;
+                return true;
+            });
+            renderCards(filtered);
+        }
+
+        function renderLoginView(target) {
+            target.innerHTML = `
+                <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-2xl p-8 shadow-xs mt-12">
+                    <h2 class="text-2xl font-black text-slate-900 mb-2 tracking-tight">Welcome Back</h2>
+                    <p class="text-slate-500 text-sm mb-6">Enter platform configuration operational credentials.</p>
+                    <form id="login-form" onsubmit="executeLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Address</label>
+                            <input type="email" id="login-email" required class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Security Key Access Password</label>
+                            <input type="password" id="login-pass" required class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div id="login-err" class="text-red-500 text-xs hidden font-medium"></div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg py-3 text-sm transition shadow-sm">Authorize Session</button>
+                    </form>
+                </div>
+            `;
+        }
+
+        async function executeLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-pass").value;
+            const errNode = document.getElementById("login-err");
+            
+            try {
+                let res = await fetch(`${API_URL}?action=login`, {
+                    method: "POST",
+                    body: JSON.stringify({ email, password })
+                });
+                let json = await res.json();
+                if (json.success) {
+                    localStorage.setItem("token", json.token);
+                    localStorage.setItem("role", json.role);
+                    localStorage.setItem("name", json.name);
+                    state.token = json.token;
+                    state.role = json.role;
+                    await syncSessionState();
+                    navigateTo("dashboard");
+                } else {
+                    errNode.innerText = json.error;
+                    errNode.classList.remove("hidden");
+                }
+            } catch(err) {
+                errNode.innerText = "API Transport Layer Execution Fault.";
+                errNode.classList.remove("hidden");
+            }
+        }
+
+        function renderRegisterView(target) {
+            target.innerHTML = `
+                <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-2xl p-8 shadow-xs mt-12">
+                    <h2 class="text-2xl font-black text-slate-900 mb-2 tracking-tight">Onboard Agent Portal</h2>
+                    <p class="text-slate-500 text-sm mb-6">Create structural workspace account. Required: @gmail.com handle.</p>
+                    <form id="register-form" onsubmit="executeRegister(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Legal Corporate Identity Name</label>
+                            <input type="text" id="reg-name" required class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Corporate Gmail Address</label>
+                            <input type="email" id="reg-email" required placeholder="name@gmail.com" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Platform Password</label>
+                            <input type="password" id="reg-pass" required class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div id="reg-err" class="text-red-500 text-xs hidden font-medium"></div>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg py-3 text-sm transition shadow-sm">Initialize Account</button>
+                    </form>
+                </div>
+            `;
+        }
+
+        async function executeRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById("reg-name").value;
+            const email = document.getElementById("reg-email").value;
+            const password = document.getElementById("reg-pass").value;
+            const errNode = document.getElementById("reg-err");
+            
+            if (!email.toLowerCase().endsWith("@gmail.com")) {
+                errNode.innerText = "Validation Exception: System architecture mandates verified standard @gmail.com accounts only.";
+                errNode.classList.remove("hidden");
+                return;
+            }
+
+            try {
+                let res = await fetch(`${API_URL}?action=register`, {
+                    method: "POST",
+                    body: JSON.stringify({ name, email, password })
+                });
+                let json = await res.json();
+                if(json.success) {
+                    alert("Account context created successfully. Routing forward to verification gate.");
+                    navigateTo("login");
+                } else {
+                    errNode.innerText = json.error;
+                    errNode.classList.remove("hidden");
+                }
+            } catch(err) {
+                errNode.innerText = "Transport pipeline validation timeout.";
+                errNode.classList.remove("hidden");
+            }
+        }
+
+        async function renderDetailView(target, id) {
+            target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Fetching asset records, opening secure streams...</div>`;
+            
+            try {
+                let visId = localStorage.getItem("visitor_id");
+                let res = await fetch(`${API_URL}?action=getPostDetail&id=${id}&visitor_id=${visId}`);
+                let json = await res.json();
+                if (!json.success) {
+                    target.innerHTML = `<div class="p-8 text-red-500 text-center">${json.error}</div>`;
+                    return;
+                }
+                
+                let p = json.data;
+                
+                // Save locally to mark instantly as watched dynamically inside current browser state context
+                let watchedRegistry = JSON.parse(localStorage.getItem("watched_registry") || "[]");
+                if(!watchedRegistry.includes(p.id)) {
+                    watchedRegistry.push(p.id);
+                    localStorage.setItem("watched_registry", JSON.stringify(watchedRegistry));
+                }
+
+                let badgeClass = "badge-normal";
+                if(p.refresh_level === "Titanium") badgeClass = "badge-titanium";
+                if(p.refresh_level === "Super Hot") badgeClass = "badge-superhot";
+                if(p.refresh_level === "Hot") badgeClass = "badge-hot";
+
+                target.innerHTML = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-xs relative">
+                                <div class="flex flex-wrap items-center gap-3 mb-4">
+                                    <span class="text-[10px] font-black tracking-widest px-2.5 py-1 rounded-sm ${badgeClass}">
+                                        ${p.refresh_level.toUpperCase()}
+                                    </span>
+                                    <span class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded">
+                                        ${p.purpose.toUpperCase()}
+                                    </span>
+                                    <span class="bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-1 rounded">
+                                        ${p.property_type.toUpperCase()}
+                                    </span>
+                                    <span class="ml-auto flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded">
+                                        <i class="fa-solid fa-eye text-slate-400"></i> ${p.total_views} VIEWS
+                                    </span>
+                                </div>
+                                <h1 class="text-2xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight mb-2">${p.title}</h1>
+                                <p class="text-slate-500 text-sm flex items-center gap-1.5 mb-6"><i class="fa-solid fa-location-dot text-indigo-500"></i> ${p.location_detail}, ${p.location}</p>
+                                
+                                <div class="grid grid-cols-3 gap-4 border-y border-slate-100 py-4 my-6 text-center">
+                                    <div>
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Covered Area</div>
+                                        <div class="text-base font-black text-slate-800">${p.area} ${p.area_unit}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Bedrooms</div>
+                                        <div class="text-base font-black text-slate-800">${p.bedrooms || 'N/A'}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Bathrooms</div>
+                                        <div class="text-base font-black text-slate-800">${p.bathrooms || 'N/A'}</div>
+                                    </div>
+                                </div>
+
+                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-3">Structural Description</h3>
+                                <p class="text-slate-600 text-sm whitespace-pre-line leading-relaxed">${p.description}</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs">
+                                <div class="text-center pb-6 border-b border-slate-100">
+                                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 text-2xl font-bold mx-auto mb-3 border border-slate-200">
+                                        ${p.agent_name ? p.agent_name.charAt(0).toUpperCase() : 'A'}
+                                    </div>
+                                    <h3 class="text-lg font-bold text-slate-900 tracking-tight">${p.agent_name}</h3>
+                                    <p class="text-xs font-semibold text-indigo-600 mb-1">${p.agency_name || 'Independent Specialist'}</p>
+                                </div>
+                                <div class="py-6 space-y-4">
+                                    <div>
+                                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Financial Obligation</span>
+                                        <div class="text-3xl font-black text-slate-900 tracking-tight">PKR ${Number(p.price).toLocaleString()}</div>
+                                    </div>
+                                    <a href="https://wa.me/${p.contact_number.replace(/[^0-9]/g, '')}?text=Aslam-o-Alaikum,%20I%20am%20interested%20in%20your%20listing:%20${encodeURIComponent(p.title)}%20on%20NJK%20Property%20Magazine." target="_blank" 
+                                       class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg py-3 px-4 flex items-center justify-center gap-2 text-sm transition shadow-sm">
+                                        <i class="fa-brands fa-whatsapp text-lg"></i> Contact via WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch(e) {
+                target.innerHTML = `<div class="p-8 text-red-500 text-center">Runtime trace exception mapping catalog asset.</div>`;
+            }
+        }
+
+        // ==========================================
+        // AGENT OPERATIONS DASHBOARD MANAGEMENT
+        // ==========================================
+
+        async function renderAgentDashboard(target) {
+            target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Syncing user operational profiles...</div>`;
+            
+            try {
+                let res = await fetch(`${API_URL}?action=dashboard&token=${state.token}`);
+                let json = await res.json();
+                if (!json.success) { forceLogout(); return; }
+                
+                let ov = json.overview;
+                let posts = json.posts;
+                
+                target.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Agent Console Workspace</h1>
+                            <p class="text-slate-500 text-sm">Monitor visibility allocations, pipeline logs, and manage listings.</p>
+                        </div>
+                        <button onclick="navigateTo('postForm', {post: null})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2.5 px-5 rounded-lg shadow-sm transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus"></i> Launch New Listing
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-xs">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Available Post Pipeline Allocation Quota</div>
+                            <div class="text-3xl font-black text-slate-900">${ov.postQuota}</div>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-xs">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Available Refresh Point Balance</div>
+                            <div class="text-3xl font-black text-slate-900">${ov.refreshQuota}</div>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-xs">
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Active Live Catalog Positions</div>
+                            <div class="text-3xl font-black text-slate-900">${ov.totalPostsCount}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+                                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                                    <h3 class="font-bold text-slate-900">Active Asset Management Matrix</h3>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-sm text-slate-600">
+                                        <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                                            <tr>
+                                                <th class="px-6 py-3">Property Listing</th>
+                                                <th class="px-6 py-3">Tier</th>
+                                                <th class="px-6 py-3">Views</th>
+                                                <th class="px-6 py-3 text-right">Actions Matrix</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100">
+                                            ${posts.map(p => `
+                                                <tr>
+                                                    <td class="px-6 py-4">
+                                                        <div class="font-bold text-slate-900 line-clamp-1">${p.title}</div>
+                                                        <div class="text-xs text-slate-400">${p.id} • ${p.property_type}</div>
+                                                    </td>
+                                                    <td class="px-6 py-4">
+                                                        <span class="text-[10px] font-black tracking-wide bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">${p.refresh_level.toUpperCase()}</span>
+                                                    </td>
+                                                    <td class="px-6 py-4 font-semibold text-slate-900">${p.total_views}</td>
+                                                    <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+                                                        <button onclick="triggerRefreshModal('${p.id}')" class="text-xs bg-indigo-50 text-indigo-600 font-bold px-2 py-1 rounded hover:bg-indigo-100 transition"><i class="fa-solid fa-bolt"></i> Boost</button>
+                                                        <button onclick="navigateTo('postForm', {post: ${JSON.stringify(p).replace(/"/g, '&quot;')}})" class="text-xs bg-slate-100 text-slate-600 font-bold px-2 py-1 rounded hover:bg-slate-200 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                        <button onclick="executeDeletePost('${p.id}')" class="text-xs bg-red-50 text-red-600 font-bold px-2 py-1 rounded hover:bg-red-100 transition"><i class="fa-solid fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            `).join("")}
+                                            ${posts.length === 0 ? `<tr><td colspan="4" class="px-6 py-8 text-center text-slate-400 font-medium">No assets registered in pipeline context.</td></tr>` : ''}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+                                <h3 class="font-bold text-slate-900 mb-1">Request Pipeline Extensions</h3>
+                                <p class="text-xs text-slate-400 mb-4">Submit requests for custom operational post capacities.</p>
+                                <form onsubmit="executeQuotaRequest(event)" class="space-y-3">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Additional Post Limits</label>
+                                        <input type="number" id="req-p-val" value="0" min="0" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Additional Visibility Refresh Points</label>
+                                        <input type="number" id="req-r-val" value="0" min="0" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                                    </div>
+                                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-lg transition uppercase tracking-wider">Transmit Protocol Request</button>
+                                </form>
+                            </div>
+
+                            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+                                <h3 class="font-bold text-slate-900 mb-1">Purchase Standard Deal Modules</h3>
+                                <p class="text-xs text-slate-400 mb-4">Instant system allocation packages.</p>
+                                <div id="deals-injection-target" class="space-y-3">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                await loadAgentDealsContext();
+            } catch(e) {
+                target.innerHTML = `<div class="p-8 text-red-500 text-center">Dashboard construction terminal fault.</div>`;
+            }
+        }
+
+        async function loadAgentDealsContext() {
+            const container = document.getElementById("deals-injection-target");
+            try {
+                let res = await fetch(`${API_URL}?action=getDeals&token=${state.token}`);
+                let json = await res.json();
+                if(json.success) {
+                    let activeDeals = json.data.filter(d => d.active === true || d.active === "TRUE");
+                    container.innerHTML = activeDeals.map(d => `
+                        <div class="p-3 border border-slate-200 rounded-lg flex items-center justify-between bg-slate-50">
+                            <div>
+                                <div class="font-bold text-slate-900 text-xs">${d.title}</div>
+                                <div class="text-[10px] text-slate-400">Posts: +${d.post_quota} | Boosts: +${d.refresh_quota}</div>
+                                <div class="text-xs font-black text-slate-700 mt-1">PKR ${d.price}</div>
+                            </div>
+                            <button onclick="executeDealPurchase('${d.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold py-1.5 px-3 rounded transition uppercase">Acquire</button>
+                        </div>
+                    `).join("");
+                    if(activeDeals.length === 0) container.innerHTML = `<div class="text-xs text-slate-400">No preconfigured transactional packages found.</div>`;
+                }
+            } catch(e) { container.innerHTML = `<div class="text-xs text-red-500">Deals system link failure.</div>`; }
+        }
+
+        async function executeQuotaRequest(e) {
+            e.preventDefault();
+            let requested_posts = document.getElementById("req-p-val").value;
+            let requested_refresh = document.getElementById("req-r-val").value;
+            try {
+                let res = await fetch(`${API_URL}?action=quotaRequest&token=${state.token}`, {
+                    method: "POST",
+                    body: JSON.stringify({ requested_posts, requested_refresh })
+                });
+                let json = await res.json();
+                if(json.success) {
+                    alert("Allocation parameters submitted safely to central verification arrays.");
+                    navigateTo("dashboard");
+                }
+            } catch(err) { alert("Execution network timeout failure."); }
+        }
+
+        async function executeDealPurchase(dealId) {
+            try {
+                let res = await fetch(`${API_URL}?action=dealRequest&token=${state.token}`, {
+                    method: "POST",
+                    body: JSON.stringify({ deal_id: dealId })
+                });
+                let json = await res.json();
+                if(json.success) {
+                    alert("Deal procurement protocol initialized. Awaiting balance approval processing.");
+                }
+            } catch(e) { alert("Pipeline transport error."); }
+        }
+
+        async function executeDeletePost(id) {
+            if(!confirm("Are you sure you want to delete this listing from the active index matrix?")) return;
+            try {
+                let res = await fetch(`${API_URL}?action=posts&_method=DELETE&id=${id}&token=${state.token}`, { method: "POST" });
+                let json = await res.json();
+                if(json.success) { navigateTo("dashboard"); }
+            } catch(e) { alert("Deactivation routine timeout."); }
+        }
+
+        function triggerRefreshModal(id) {
+            let level = prompt("Select Visibility Boost Tier:\n- Titanium (Costs 10 units, 30 days)\n- Super Hot (Costs 7 units, 30 days)\n- Hot (Costs 5 units, 30 days)\n- Normal (Costs 1 unit, 24 hours)", "Normal");
+            if(!level) return;
+            
+            // Standardizing strings capitalization safely
+            let formatted = level.trim().replace(/\b\w/g, c => c.toUpperCase());
+            if(!["Titanium", "Super Hot", "Hot", "Normal"].includes(formatted)) {
+                alert("Validation Fault: Selected parameter does not align with core structural metrics.");
+                return;
+            }
+            
+            fetch(`${API_URL}?action=refreshPost&token=${state.token}`, {
+                method: "POST",
+                body: JSON.stringify({ id, level: formatted })
+            }).then(r => r.json()).then(json => {
+                if(json.success) { alert("Structural matrix boosted successfully."); navigateTo("dashboard"); }
+                else { alert(json.error); }
+            }).catch(() => alert("Pipeline refresh link anomaly detected."));
+        }
+
+        // ==========================================
+        // PIXEL-PERFECT STRICT PROPERTY FORM UI
+        // ==========================================
+
+        function renderPostFormView(target, post = null) {
+            const isEdit = post !== null;
+            target.innerHTML = `
+                <div class="max-w-2xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="bg-slate-900 p-6 text-white">
+                        <h2 class="text-xl font-black tracking-tight">${isEdit ? 'MODIFY REGISTERED CATALOG RECORD' : 'LAUNCH NEW PREMIUM LISTING BLOCK'}</h2>
+                        <p class="text-xs text-slate-400 mt-1">Provide strict asset parameters. Input sanitization patterns are actively enforced.</p>
+                    </div>
+                    <form id="property-core-form" onsubmit="executeSubmitPost(event, ${isEdit ? `'${post.id}'` : 'null'})" class="p-6 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Listing Identifier Title</label>
+                                <input type="text" id="f-title" required value="${isEdit ? post.title : ''}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Property Deployment Classification</label>
+                                <select id="f-type" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                                    <option ${isEdit && post.property_type === 'House' ? 'selected' : ''} value="House">House</option>
+                                    <option ${isEdit && post.property_type === 'Apartment' ? 'selected' : ''} value="Apartment">Apartment</option>
+                                    <option ${isEdit && post.property_type === 'Plot' ? 'selected' : ''} value="Plot">Plot</option>
+                                    <option ${isEdit && post.property_type === 'Commercial' ? 'selected' : ''} value="Commercial">Commercial</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Target Market Purpose Matrix</label>
+                                <select id="f-purpose" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                                    <option ${isEdit && post.purpose === 'For Sale' ? 'selected' : ''} value="For Sale">For Sale</option>
+                                    <option ${isEdit && post.purpose === 'For Rent' ? 'selected' : ''} value="For Rent">For Rent</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Financial Cost Valuation (PKR)</label>
+                                <input type="number" id="f-price" required value="${isEdit ? post.price : ''}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Total Dimensional Area</label>
+                                <input type="number" id="f-area" required value="${isEdit ? post.area : ''}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Measurement Metric Scale</label>
+                                <select id="f-unit" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                                    <option ${isEdit && post.area_unit === 'Marla' ? 'selected' : ''} value="Marla">Marla</option>
+                                    <option ${isEdit && post.area_unit === 'Kanal' ? 'selected' : ''} value="Kanal">Kanal</option>
+                                    <option ${isEdit && post.area_unit === 'Sq. Ft.' ? 'selected' : ''} value="Sq. Ft.">Sq. Ft.</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Primary Region Core City</label>
+                                <input type="text" id="f-loc" required value="${isEdit ? post.location : ''}" placeholder="e.g. Lahore, Islamabad" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Bedrooms Configuration Count</label>
+                                <input type="number" id="f-beds" value="${isEdit ? post.bedrooms : '0'}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Washrooms Configuration Count</label>
+                                <input type="number" id="f-baths" value="${isEdit ? post.bathrooms : '0'}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Granular Location Details Address Mapping</label>
+                            <input type="text" id="f-loc-det" required value="${isEdit ? post.location_detail : ''}" placeholder="e.g. Phase 6, Block CCA" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Agency Corporate Nomenclature Branding Name</label>
+                                <input type="text" id="f-agency" value="${isEdit ? post.agency_name : ''}" placeholder="e.g. NJK Realty Holdings" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Verified Structural WhatsApp Contact Telephone Handle</label>
+                                <input type="text" id="f-phone" required value="${isEdit ? post.contact_number : ''}" placeholder="e.g. 923001234567" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Public Marketplace Profile Summary Description Text</label>
+                            <textarea id="f-desc" rows="4" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-1 focus:ring-indigo-500">${isEdit ? post.description : ''}</textarea>
+                        </div>
+
+                        <div class="flex gap-4 pt-4 border-t border-slate-100 justify-end">
+                            <button type="button" onclick="navigateTo('dashboard')" class="px-5 py-2.5 border border-slate-300 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition">Cancel and Back</button>
+                            <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-xs transition">Commit Record Array</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        async function executeSubmitPost(e, editId) {
+            e.preventDefault();
+            let payload = {
+                title: document.getElementById("f-title").value,
+                property_type: document.getElementById("f-type").value,
+                purpose: document.getElementById("f-purpose").value,
+                price: parseFloat(document.getElementById("f-price").value),
+                area: parseFloat(document.getElementById("f-area").value),
+                area_unit: document.getElementById("f-unit").value,
+                location: document.getElementById("f-loc").value,
+                bedrooms: parseInt(document.getElementById("f-beds").value || 0, 10),
+                bathrooms: parseInt(document.getElementById("f-baths").value || 0, 10),
+                location_detail: document.getElementById("f-loc-det").value,
+                agency_name: document.getElementById("f-agency").value,
+                contact_number: document.getElementById("f-phone").value,
+                description: document.getElementById("f-desc").value,
+                token: state.token
+            };
+
+            let actionTarget = "posts";
+            if(editId) {
+                payload.id = editId;
+                payload._method = "PUT";
+            }
+
+            try {
+                let res = await fetch(`${API_URL}?action=${actionTarget}`, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                let json = await res.json();
+                if(json.success) {
+                    alert("Asset structural record successfully verified and written to main table arrays.");
+                    navigateTo("dashboard");
+                } else { alert("Operational Failure: " + json.error); }
+            } catch(err) { alert("Core pipeline processing lock failure."); }
+        }
+
+        // ==========================================
+        // MASTER CENTRAL CONTROL ADMIN DASHBOARD
+        // ==========================================
+
+        async function renderAdminDashboard(target) {
+            target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Opening master administrative streams...</div>`;
+            
+            try {
+                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${state.token}`);
+                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${state.token}`);
+                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${state.token}`);
+                
+                let users = await uRes.json();
+                let quotas = await qRes.json();
+                let deals = await dRes.json();
+                
+                target.innerHTML = `
+                    <div class="mb-8">
+                        <h1 class="text-3xl font-black text-slate-900 tracking-tight">Root Administrator Core</h1>
+                        <p class="text-slate-500 text-sm">System management interface across multi-tenant database layers.</p>
+                    </div>
+
+                    <div class="space-y-12">
+                        <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+                            <div class="px-6 py-4 bg-slate-900 text-white font-bold text-sm tracking-wide uppercase">Pending Agent Pipe Quota Demands</div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-slate-600">
+                                    <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-3">Req ID</th>
+                                            <th class="px-6 py-3">Agent</th>
+                                            <th class="px-6 py-3">Demands</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3 text-right">Processing Command Line</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${quotas.data.filter(q => q.status === 'pending').map(q => `
+                                            <tr>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${q.id}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-900">${q.user_id}</td>
+                                                <td class="px-6 py-4">Posts: +${q.requested_posts} | Boosts: +${q.requested_refresh}</td>
+                                                <td class="px-6 py-4"><span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">PENDING</span></td>
+                                                <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+                                                    <button onclick="processAdminQuota('${q.id}', 'accepted')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-emerald-700 transition">Approve</button>
+                                                    <button onclick="processAdminQuota('${q.id}', 'rejected')" class="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-red-700 transition">Deny</button>
+                                                </td>
+                                            </tr>
+                                        `).join("")}
+                                        ${quotas.data.filter(q => q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+                            <div class="px-6 py-4 bg-slate-900 text-white font-bold text-sm tracking-wide uppercase">Transactional Premium Deal Demands Ledger</div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-slate-600">
+                                    <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-3">Order ID</th>
+                                            <th class="px-6 py-3">Deal Node</th>
+                                            <th class="px-6 py-3">Agent Node</th>
+                                            <th class="px-6 py-3">Status</th>
+                                            <th class="px-6 py-3 text-right">Execution</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${deals.data.filter(d => d.status === 'pending').map(d => `
+                                            <tr>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${d.id}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-900">${d.deal_id}</td>
+                                                <td class="px-6 py-4">${d.user_id}</td>
+                                                <td class="px-6 py-4"><span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">PENDING</span></td>
+                                                <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+                                                    <button onclick="processAdminDeal('${d.id}', 'accepted')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-emerald-700 transition">Confirm Payment</button>
+                                                    <button onclick="processAdminDeal('${d.id}', 'rejected')" class="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-red-700 transition">Void Order</button>
+                                                </td>
+                                            </tr>
+                                        `).join("")}
+                                        ${deals.data.filter(d => d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+                            <div class="px-6 py-4 bg-slate-900 text-white font-bold text-sm tracking-wide uppercase flex justify-between items-center">
+                                <span>Multi-Tenant Identity Matrix Base</span>
+                                <button onclick="triggerManualQuotaAssignment()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-1 px-3 rounded transition">Manual Override Entry</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-slate-600">
+                                    <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-3">User Node ID</th>
+                                            <th class="px-6 py-3">Identity / Email</th>
+                                            <th class="px-6 py-3">Security Role</th>
+                                            <th class="px-6 py-3">Quota Limits Status</th>
+                                            <th class="px-6 py-3">Live State</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${users.data.map(u => `
+                                            <tr>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${u.id}</td>
+                                                <td class="px-6 py-4">
+                                                    <div class="font-bold text-slate-900">${u.name}</div>
+                                                    <div class="text-xs text-slate-400">${u.email}</div>
+                                                </td>
+                                                <td class="px-6 py-4 font-semibold text-slate-800 uppercase text-xs tracking-wider">${u.role}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-700">Posts: ${u.assigned_post_quota} | Boosts: ${u.assigned_refresh_quota}</td>
+                                                <td class="px-6 py-4">
+                                                    <span class="text-xs font-bold px-2 py-0.5 rounded ${u.active === true || u.active === 'TRUE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+                                                        ${u.active === true || u.active === 'TRUE' ? 'ACTIVE' : 'DEACTIVATED'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `).join("")}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch(e) { target.innerHTML = `<div class="p-8 text-red-500 text-center">Root administrative visualization compilation fault.</div>`; }
+        }
+
+        async function processAdminQuota(id, status) {
+            let note = prompt("Attach operational processing signature administrative note:");
+            try {
+                let res = await fetch(`${API_URL}?action=adminProcessQuota&token=${state.token}`, {
+                    method: "POST",
+                    body: JSON.stringify({ id, status, admin_note: note })
+                });
+                let json = await res.json();
+                if(json.success) { navigateTo("dashboard"); }
+            } catch(e) { alert("Core database connection error."); }
+        }
+
+        async function processAdminDeal(id, status) {
+            let note = prompt("Attach transactional balance verification note:");
+            try {
+                let res = await fetch(`${API_URL}?action=adminProcessDeal&token=${state.token}`, {
+                    method: "POST",
+                    body: JSON.stringify({ id, status, admin_note: note })
+                });
+                let json = await res.json();
+                if(json.success) { navigateTo("dashboard"); }
+            } catch(e) { alert("Core connection trace fault."); }
+        }
+
+        function triggerManualQuotaAssignment() {
+            let user_id = prompt("Provide target operational User unique identity tracking ID (e.g., USR-00001):");
+            if(!user_id) return;
+            let assigned_post_quota = prompt("Set total maximum post allocation value:", "5");
+            let assigned_refresh_quota = prompt("Set total visibility refresh pool balance:", "20");
+            
+            fetch(`${API_URL}?action=adminManualQuota&token=${state.token}`, {
+                method: "POST",
+                body: JSON.stringify({ user_id, assigned_post_quota, assigned_refresh_quota })
+            }).then(r=>r.json()).then(json => {
+                if(json.success) { alert("User permission records modified."); navigateTo("dashboard"); }
+                else { alert(json.error); }
+            }).catch(() => alert("Terminal override tracking timeout error."));
+        }
+    </script>
 </body>
 </html>
