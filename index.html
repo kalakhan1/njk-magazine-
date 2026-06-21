@@ -65,6 +65,9 @@
                 let json = await res.json();
                 if (json.success) {
                     state.user = json.data;
+                    state.role = json.data.role;
+                    localStorage.setItem("role", json.data.role);
+                    localStorage.setItem("name", json.data.name);
                 } else {
                     forceLogout();
                 }
