@@ -17,23 +17,30 @@
 
     <nav class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('portal')">
-                    <i class="fa-solid fa-building-shield text-indigo-600 text-2xl"></i>
-                    <span class="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">NJK PROPERTY MAGAZINE</span>
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigateTo('portal')">
+                    <i class="fa-solid fa-newspaper text-indigo-600 text-2xl mr-2"></i>
+                    <span class="text-xl font-black text-slate-900 tracking-tight">NJK PROPERTY <span class="text-indigo-600 font-medium">MAGAZINE</span></span>
                 </div>
-                <div class="flex items-center gap-4" id="nav-auth-cluster">
+                <div id="nav-auth-cluster" class="flex items-center gap-4">
                     </div>
             </div>
         </div>
     </nav>
 
-    <main id="app-viewport" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-4rem)]">
-        </main>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="app-viewport">
+            </div>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white mt-24 py-6 text-center text-xs text-slate-400 font-semibold tracking-wide uppercase">
+        &copy; 2026 HNK & SHEEKAN TECH AND STUDIO. All Rights Reserved.
+    </footer>
 
     <script>
         // REPLACE THIS EXPLICITLY WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP LINK
         const API_URL = "https://script.google.com/macros/s/AKfycbwfPzHWJgJZvEoe31aAXhWC9igh8DNi2QRnt6YzbEVplZozFvIKiBXsiwIS4mB_6jQpYw/exec";
+        
         // Global State Engine
         let state = {
             user: null,
@@ -61,11 +68,12 @@
 
         async function syncSessionState() {
             try {
-                let res = await fetch(`${API_URL}?action=profile&token=${state.token}`);
+                let res = await fetch(`${API_URL}?action=profile&token=${encodeURIComponent(state.token)}`);
                 let json = await res.json();
                 if (json.success) {
                     state.user = json.data;
                 } else {
+                    alert("Session Sync Error: " + (json.error || "Session Invalid"));
                     forceLogout();
                 }
             } catch(e) {
@@ -152,8 +160,7 @@
                     <h2 class="text-xl font-bold text-slate-900">Verified Database Index</h2>
                     <span id="result-counter" class="text-sm font-medium text-slate-500">Loading listings...</span>
                 </div>
-                <div id="portal-listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    </div>
+                <div id="portal-listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
             `;
             await loadPortalData();
         }
@@ -276,7 +283,7 @@
                     localStorage.setItem("name", json.name);
                     state.token = json.token;
                     state.role = json.role;
-                    // BYPASSED redundant syncSessionState sync sequence causing portal loop drops
+                    await syncSessionState();
                     navigateTo("dashboard");
                 } else {
                     errNode.innerText = json.error;
@@ -448,9 +455,13 @@
             target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Syncing user operational profiles...</div>`;
             
             try {
-                let res = await fetch(`${API_URL}?action=dashboard&token=${state.token}`);
+                let res = await fetch(`${API_URL}?action=dashboard&token=${encodeURIComponent(state.token)}`);
                 let json = await res.json();
-                if (!json.success) { forceLogout(); return; }
+                if (!json.success) { 
+                    alert("Dashboard Access Error: " + (json.error || "Deactivated Session"));
+                    forceLogout(); 
+                    return; 
+                }
                 
                 let ov = json.overview;
                 let posts = json.posts;
@@ -542,8 +553,7 @@
                             <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
                                 <h3 class="font-bold text-slate-900 mb-1">Purchase Standard Deal Modules</h3>
                                 <p class="text-xs text-slate-400 mb-4">Instant system allocation packages.</p>
-                                <div id="deals-injection-target" class="space-y-3">
-                                    </div>
+                                <div id="deals-injection-target" class="space-y-3"></div>
                             </div>
                         </div>
                     </div>
@@ -557,7 +567,7 @@
         async function loadAgentDealsContext() {
             const container = document.getElementById("deals-injection-target");
             try {
-                let res = await fetch(`${API_URL}?action=getDeals&token=${state.token}`);
+                let res = await fetch(`${API_URL}?action=getDeals&token=${encodeURIComponent(state.token)}`);
                 let json = await res.json();
                 if(json.success) {
                     let activeDeals = json.data.filter(d => d.active === true || d.active === "TRUE");
@@ -581,7 +591,7 @@
             let requested_posts = document.getElementById("req-p-val").value;
             let requested_refresh = document.getElementById("req-r-val").value;
             try {
-                let res = await fetch(`${API_URL}?action=quotaRequest&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=quotaRequest&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ requested_posts, requested_refresh })
                 });
@@ -595,7 +605,7 @@
 
         async function executeDealPurchase(dealId) {
             try {
-                let res = await fetch(`${API_URL}?action=dealRequest&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=dealRequest&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ deal_id: dealId })
                 });
@@ -609,7 +619,7 @@
         async function executeDeletePost(id) {
             if(!confirm("Are you sure you want to delete this listing from the active index matrix?")) return;
             try {
-                let res = await fetch(`${API_URL}?action=posts&_method=DELETE&id=${id}&token=${state.token}`, { method: "POST" });
+                let res = await fetch(`${API_URL}?action=posts&_method=DELETE&id=${id}&token=${encodeURIComponent(state.token)}`, { method: "POST" });
                 let json = await res.json();
                 if(json.success) { navigateTo("dashboard"); }
             } catch(e) { alert("Deactivation routine timeout."); }
@@ -626,7 +636,7 @@
                 return;
             }
             
-            fetch(`${API_URL}?action=refreshPost&token=${state.token}`, {
+            fetch(`${API_URL}?action=refreshPost&token=${encodeURIComponent(state.token)}`, {
                 method: "POST",
                 body: JSON.stringify({ id, level: formatted })
             }).then(r => r.json()).then(json => {
@@ -784,18 +794,13 @@
             target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Opening master administrative streams...</div>`;
             
             try {
-                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${state.token}`);
-                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${state.token}`);
-                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${state.token}`);
+                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${encodeURIComponent(state.token)}`);
+                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${encodeURIComponent(state.token)}`);
+                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${encodeURIComponent(state.token)}`);
                 
                 let users = await uRes.json();
                 let quotas = await qRes.json();
                 let deals = await dRes.json();
-
-                // Safe fallback arrays to prevent array loop .filter / .map execution compilation failures
-                let usersList = Array.isArray(users.data) ? users.data : [];
-                let quotasList = Array.isArray(quotas.data) ? quotas.data : [];
-                let dealsList = Array.isArray(deals.data) ? deals.data : [];
                 
                 target.innerHTML = `
                     <div class="mb-8">
@@ -818,7 +823,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${quotasList.filter(q => q.status === 'pending').map(q => `
+                                        ${quotas.data.filter(q => q.status === 'pending').map(q => `
                                             <tr>
                                                 <td class="px-6 py-4 font-mono font-bold text-xs">${q.id}</td>
                                                 <td class="px-6 py-4 font-medium text-slate-900">${q.user_id}</td>
@@ -830,7 +835,7 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${quotasList.filter(q => q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
+                                        ${quotas.data.filter(q => q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -850,7 +855,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${dealsList.filter(d => d.status === 'pending').map(d => `
+                                        ${deals.data.filter(d => d.status === 'pending').map(d => `
                                             <tr>
                                                 <td class="px-6 py-4 font-mono font-bold text-xs">${d.id}</td>
                                                 <td class="px-6 py-4 font-medium text-slate-900">${d.deal_id}</td>
@@ -862,7 +867,7 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${dealsList.filter(d => d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
+                                        ${deals.data.filter(d => d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -885,7 +890,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${usersList.map(u => `
+                                        ${users.data.map(u => `
                                             <tr>
                                                 <td class="px-6 py-4 font-mono font-bold text-xs">${u.id}</td>
                                                 <td class="px-6 py-4">
@@ -901,23 +906,19 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${usersList.length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No users found in database layer.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 `;
-            } catch(e) { 
-                console.error(e);
-                target.innerHTML = `<div class="p-8 text-red-500 text-center">Root administrative visualization compilation fault.</div>`; 
-            }
+            } catch(e) { target.innerHTML = `<div class="p-8 text-red-500 text-center">Root administrative visualization compilation fault.</div>`; }
         }
 
         async function processAdminQuota(id, status) {
             let note = prompt("Attach operational processing signature administrative note:");
             try {
-                let res = await fetch(`${API_URL}?action=adminProcessQuota&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=adminProcessQuota&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ id, status, admin_note: note })
                 });
@@ -929,7 +930,7 @@
         async function processAdminDeal(id, status) {
             let note = prompt("Attach transactional balance verification note:");
             try {
-                let res = await fetch(`${API_URL}?action=adminProcessDeal&token=${state.token}`, {
+                let res = await fetch(`${API_URL}?action=adminProcessDeal&token=${encodeURIComponent(state.token)}`, {
                     method: "POST",
                     body: JSON.stringify({ id, status, admin_note: note })
                 });
@@ -944,7 +945,7 @@
             let assigned_post_quota = prompt("Set total maximum post allocation value:", "5");
             let assigned_refresh_quota = prompt("Set total visibility refresh pool balance:", "20");
             
-            fetch(`${API_URL}?action=adminManualQuota&token=${state.token}`, {
+            fetch(`${API_URL}?action=adminManualQuota&token=${encodeURIComponent(state.token)}`, {
                 method: "POST",
                 body: JSON.stringify({ user_id, assigned_post_quota, assigned_refresh_quota })
             }).then(r=>r.json()).then(json => {
