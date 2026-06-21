@@ -23,18 +23,17 @@
                     <span class="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">NJK PROPERTY MAGAZINE</span>
                 </div>
                 <div class="flex items-center gap-4" id="nav-auth-cluster">
-                </div>
+                    </div>
             </div>
         </div>
     </nav>
 
     <main id="app-viewport" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-4rem)]">
-    </main>
+        </main>
 
     <script>
         // REPLACE THIS EXPLICITLY WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP LINK
         const API_URL = "https://script.google.com/macros/s/AKfycbwfPzHWJgJZvEoe31aAXhWC9igh8DNi2QRnt6YzbEVplZozFvIKiBXsiwIS4mB_6jQpYw/exec";
-        
         // Global State Engine
         let state = {
             user: null,
@@ -50,9 +49,6 @@
             generateVisitorId();
             if (state.token) {
                 await syncSessionState();
-                if (state.token) {
-                    state.currentView = "dashboard";
-                }
             }
             renderApp();
         });
@@ -64,15 +60,11 @@
         }
 
         async function syncSessionState() {
-            if (!state.token) return;
             try {
-                let res = await fetch(`${API_URL}?action=profile&token=${encodeURIComponent(state.token)}`);
+                let res = await fetch(`${API_URL}?action=profile&token=${state.token}`);
                 let json = await res.json();
                 if (json.success) {
                     state.user = json.data;
-                    state.role = json.data.role;
-                    localStorage.setItem("role", json.data.role);
-                    localStorage.setItem("name", json.data.name);
                 } else {
                     forceLogout();
                 }
@@ -161,7 +153,7 @@
                     <span id="result-counter" class="text-sm font-medium text-slate-500">Loading listings...</span>
                 </div>
                 <div id="portal-listings-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                </div>
+                    </div>
             `;
             await loadPortalData();
         }
@@ -183,7 +175,7 @@
         function renderCards(items) {
             const grid = document.getElementById("portal-listings-grid");
             const counter = document.getElementById("result-counter");
-            if (counter) counter.innerText = `${items.length} records populated`;
+            counter.innerText = `${items.length} records populated`;
             
             if (items.length === 0) {
                 grid.innerHTML = `<div class="p-12 text-slate-400 text-center col-span-3">No active properties match parameters.</div>`;
@@ -279,14 +271,12 @@
                 });
                 let json = await res.json();
                 if (json.success) {
-                    state.token = json.token;
-                    state.role = json.role;
-                    state.user = { name: json.name, role: json.role, email: email };
-                    
                     localStorage.setItem("token", json.token);
                     localStorage.setItem("role", json.role);
                     localStorage.setItem("name", json.name);
-                    
+                    state.token = json.token;
+                    state.role = json.role;
+                    // BYPASSED redundant syncSessionState sync sequence causing portal loop drops
                     navigateTo("dashboard");
                 } else {
                     errNode.innerText = json.error;
@@ -369,6 +359,7 @@
                 
                 let p = json.data;
                 
+                // Save locally to mark instantly as watched dynamically inside current browser state context
                 let watchedRegistry = JSON.parse(localStorage.getItem("watched_registry") || "[]");
                 if(!watchedRegistry.includes(p.id)) {
                     watchedRegistry.push(p.id);
@@ -457,13 +448,9 @@
             target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Syncing user operational profiles...</div>`;
             
             try {
-                let res = await fetch(`${API_URL}?action=dashboard&token=${encodeURIComponent(state.token)}`);
+                let res = await fetch(`${API_URL}?action=dashboard&token=${state.token}`);
                 let json = await res.json();
-                
-                if (!json.success) { 
-                    target.innerHTML = `<div class="p-8 text-center"><p class="text-red-500 font-medium mb-4">Dashboard pipeline access rejected: ${json.error || 'Unauthorized context'}</p><button onclick="forceLogout()" class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg uppercase">Return to Safety</button></div>`;
-                    return; 
-                }
+                if (!json.success) { forceLogout(); return; }
                 
                 let ov = json.overview;
                 let posts = json.posts;
@@ -556,7 +543,7 @@
                                 <h3 class="font-bold text-slate-900 mb-1">Purchase Standard Deal Modules</h3>
                                 <p class="text-xs text-slate-400 mb-4">Instant system allocation packages.</p>
                                 <div id="deals-injection-target" class="space-y-3">
-                                </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -570,7 +557,7 @@
         async function loadAgentDealsContext() {
             const container = document.getElementById("deals-injection-target");
             try {
-                let res = await fetch(`${API_URL}?action=getDeals&token=${encodeURIComponent(state.token)}`);
+                let res = await fetch(`${API_URL}?action=getDeals&token=${state.token}`);
                 let json = await res.json();
                 if(json.success) {
                     let activeDeals = json.data.filter(d => d.active === true || d.active === "TRUE");
@@ -594,7 +581,7 @@
             let requested_posts = document.getElementById("req-p-val").value;
             let requested_refresh = document.getElementById("req-r-val").value;
             try {
-                let res = await fetch(`${API_URL}?action=quotaRequest&token=${encodeURIComponent(state.token)}`, {
+                let res = await fetch(`${API_URL}?action=quotaRequest&token=${state.token}`, {
                     method: "POST",
                     body: JSON.stringify({ requested_posts, requested_refresh })
                 });
@@ -608,7 +595,7 @@
 
         async function executeDealPurchase(dealId) {
             try {
-                let res = await fetch(`${API_URL}?action=dealRequest&token=${encodeURIComponent(state.token)}`, {
+                let res = await fetch(`${API_URL}?action=dealRequest&token=${state.token}`, {
                     method: "POST",
                     body: JSON.stringify({ deal_id: dealId })
                 });
@@ -622,7 +609,7 @@
         async function executeDeletePost(id) {
             if(!confirm("Are you sure you want to delete this listing from the active index matrix?")) return;
             try {
-                let res = await fetch(`${API_URL}?action=posts&_method=DELETE&id=${id}&token=${encodeURIComponent(state.token)}`, { method: "POST" });
+                let res = await fetch(`${API_URL}?action=posts&_method=DELETE&id=${id}&token=${state.token}`, { method: "POST" });
                 let json = await res.json();
                 if(json.success) { navigateTo("dashboard"); }
             } catch(e) { alert("Deactivation routine timeout."); }
@@ -632,13 +619,14 @@
             let level = prompt("Select Visibility Boost Tier:\n- Titanium (Costs 10 units, 30 days)\n- Super Hot (Costs 7 units, 30 days)\n- Hot (Costs 5 units, 30 days)\n- Normal (Costs 1 unit, 24 hours)", "Normal");
             if(!level) return;
             
+            // Standardizing strings capitalization safely
             let formatted = level.trim().replace(/\b\w/g, c => c.toUpperCase());
             if(!["Titanium", "Super Hot", "Hot", "Normal"].includes(formatted)) {
                 alert("Validation Fault: Selected parameter does not align with core structural metrics.");
                 return;
             }
             
-            fetch(`${API_URL}?action=refreshPost&token=${encodeURIComponent(state.token)}`, {
+            fetch(`${API_URL}?action=refreshPost&token=${state.token}`, {
                 method: "POST",
                 body: JSON.stringify({ id, level: formatted })
             }).then(r => r.json()).then(json => {
@@ -716,7 +704,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Washrooms Configuration Count</label>
-                                <input type="number" id="f-baths" value="${isEdit ? post.baths : '0'}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                                <input type="number" id="f-baths" value="${isEdit ? post.bathrooms : '0'}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
                             </div>
                         </div>
 
@@ -796,18 +784,18 @@
             target.innerHTML = `<div class="p-12 text-center text-slate-500 font-medium"><i class="fa-solid fa-circle-notch animate-spin text-indigo-600 text-3xl mb-4"></i><br>Opening master administrative streams...</div>`;
             
             try {
-                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${encodeURIComponent(state.token)}`);
-                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${encodeURIComponent(state.token)}`);
-                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${encodeURIComponent(state.token)}`);
+                let uRes = await fetch(`${API_URL}?action=adminUsers&token=${state.token}`);
+                let qRes = await fetch(`${API_URL}?action=adminQuotaRequests&token=${state.token}`);
+                let dRes = await fetch(`${API_URL}?action=adminDealRequests&token=${state.token}`);
                 
                 let users = await uRes.json();
                 let quotas = await qRes.json();
                 let deals = await dRes.json();
-                
-                // Crash-proofing fallback structures setup
-                let usersList = (users && users.data) ? users.data : [];
-                let quotasList = (quotas && quotas.data) ? quotas.data : [];
-                let dealsList = (deals && deals.data) ? deals.data : [];
+
+                // Safe fallback arrays to prevent array loop .filter / .map execution compilation failures
+                let usersList = Array.isArray(users.data) ? users.data : [];
+                let quotasList = Array.isArray(quotas.data) ? quotas.data : [];
+                let dealsList = Array.isArray(deals.data) ? deals.data : [];
                 
                 target.innerHTML = `
                     <div class="mb-8">
@@ -830,11 +818,11 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${quotasList.filter(q => q && q.status === 'pending').map(q => `
+                                        ${quotasList.filter(q => q.status === 'pending').map(q => `
                                             <tr>
-                                                <td class="px-6 py-4 font-mono font-bold text-xs">${q.id || 'N/A'}</td>
-                                                <td class="px-6 py-4 font-medium text-slate-900">${q.user_id || 'Unknown'}</td>
-                                                <td class="px-6 py-4">Posts: +${q.requested_posts || 0} | Boosts: +${q.requested_refresh || 0}</td>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${q.id}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-900">${q.user_id}</td>
+                                                <td class="px-6 py-4">Posts: +${q.requested_posts} | Boosts: +${q.requested_refresh}</td>
                                                 <td class="px-6 py-4"><span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">PENDING</span></td>
                                                 <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
                                                     <button onclick="processAdminQuota('${q.id}', 'accepted')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-emerald-700 transition">Approve</button>
@@ -842,7 +830,7 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${quotasList.filter(q => q && q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
+                                        ${quotasList.filter(q => q.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">All clear. No pending allocation logs.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -862,11 +850,11 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${dealsList.filter(d => d && d.status === 'pending').map(d => `
+                                        ${dealsList.filter(d => d.status === 'pending').map(d => `
                                             <tr>
-                                                <td class="px-6 py-4 font-mono font-bold text-xs">${d.id || 'N/A'}</td>
-                                                <td class="px-6 py-4 font-medium text-slate-900">${d.deal_id || 'N/A'}</td>
-                                                <td class="px-6 py-4">${d.user_id || 'Unknown'}</td>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${d.id}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-900">${d.deal_id}</td>
+                                                <td class="px-6 py-4">${d.user_id}</td>
                                                 <td class="px-6 py-4"><span class="text-xs text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">PENDING</span></td>
                                                 <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
                                                     <button onclick="processAdminDeal('${d.id}', 'accepted')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded hover:bg-emerald-700 transition">Confirm Payment</button>
@@ -874,7 +862,7 @@
                                                 </td>
                                             </tr>
                                         `).join("")}
-                                        ${dealsList.filter(d => d && d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
+                                        ${dealsList.filter(d => d.status === 'pending').length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No pending financial purchase orders found.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -897,26 +885,23 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-100">
-                                        ${usersList.map(u => {
-                                            if (!u) return '';
-                                            return `
-                                                <tr>
-                                                    <td class="px-6 py-4 font-mono font-bold text-xs">${u.id || 'N/A'}</td>
-                                                    <td class="px-6 py-4">
-                                                        <div class="font-bold text-slate-900">${u.name || 'Unnamed'}</div>
-                                                        <div class="text-xs text-slate-400">${u.email || ''}</div>
-                                                    </td>
-                                                    <td class="px-6 py-4 font-semibold text-slate-800 uppercase text-xs tracking-wider">${u.role || 'Agent'}</td>
-                                                    <td class="px-6 py-4 font-medium text-slate-700">Posts: ${u.assigned_post_quota ?? 0} | Boosts: ${u.assigned_refresh_quota ?? 0}</td>
-                                                    <td class="px-6 py-4">
-                                                        <span class="text-xs font-bold px-2 py-0.5 rounded ${u.active === true || u.active === 'TRUE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
-                                                            ${u.active === true || u.active === 'TRUE' ? 'ACTIVE' : 'DEACTIVATED'}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            `;
-                                        }).join("")}
-                                        ${usersList.length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No user nodes detected in central directory.</td></tr>` : ''}
+                                        ${usersList.map(u => `
+                                            <tr>
+                                                <td class="px-6 py-4 font-mono font-bold text-xs">${u.id}</td>
+                                                <td class="px-6 py-4">
+                                                    <div class="font-bold text-slate-900">${u.name}</div>
+                                                    <div class="text-xs text-slate-400">${u.email}</div>
+                                                </td>
+                                                <td class="px-6 py-4 font-semibold text-slate-800 uppercase text-xs tracking-wider">${u.role}</td>
+                                                <td class="px-6 py-4 font-medium text-slate-700">Posts: ${u.assigned_post_quota} | Boosts: ${u.assigned_refresh_quota}</td>
+                                                <td class="px-6 py-4">
+                                                    <span class="text-xs font-bold px-2 py-0.5 rounded ${u.active === true || u.active === 'TRUE' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}">
+                                                        ${u.active === true || u.active === 'TRUE' ? 'ACTIVE' : 'DEACTIVATED'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `).join("")}
+                                        ${usersList.length === 0 ? `<tr><td colspan="5" class="px-6 py-6 text-center text-slate-400 font-medium">No users found in database layer.</td></tr>` : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -924,22 +909,15 @@
                     </div>
                 `;
             } catch(e) { 
-                console.error("Critical Exception in Admin Dashboard Layer Architecture:", e);
-                target.innerHTML = `
-                    <div class="p-8 text-red-500 text-center max-w-md mx-auto bg-red-50 border border-red-200 rounded-xl mt-12 shadow-xs">
-                        <i class="fa-solid fa-triangle-exclamation text-3xl mb-3"></i>
-                        <p class="font-bold">Root administrative visualization compilation fault.</p>
-                        <p class="text-xs text-red-400 mt-1">Please inspect browser console arrays to trace JSON structural anomalies.</p>
-                        <button onclick="navigateTo('portal')" class="mt-4 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg uppercase tracking-wider transition">Back to Main Catalog</button>
-                    </div>
-                `; 
+                console.error(e);
+                target.innerHTML = `<div class="p-8 text-red-500 text-center">Root administrative visualization compilation fault.</div>`; 
             }
         }
 
         async function processAdminQuota(id, status) {
             let note = prompt("Attach operational processing signature administrative note:");
             try {
-                let res = await fetch(`${API_URL}?action=adminProcessQuota&token=${encodeURIComponent(state.token)}`, {
+                let res = await fetch(`${API_URL}?action=adminProcessQuota&token=${state.token}`, {
                     method: "POST",
                     body: JSON.stringify({ id, status, admin_note: note })
                 });
@@ -951,7 +929,7 @@
         async function processAdminDeal(id, status) {
             let note = prompt("Attach transactional balance verification note:");
             try {
-                let res = await fetch(`${API_URL}?action=adminProcessDeal&token=${encodeURIComponent(state.token)}`, {
+                let res = await fetch(`${API_URL}?action=adminProcessDeal&token=${state.token}`, {
                     method: "POST",
                     body: JSON.stringify({ id, status, admin_note: note })
                 });
@@ -966,7 +944,7 @@
             let assigned_post_quota = prompt("Set total maximum post allocation value:", "5");
             let assigned_refresh_quota = prompt("Set total visibility refresh pool balance:", "20");
             
-            fetch(`${API_URL}?action=adminManualQuota&token=${encodeURIComponent(state.token)}`, {
+            fetch(`${API_URL}?action=adminManualQuota&token=${state.token}`, {
                 method: "POST",
                 body: JSON.stringify({ user_id, assigned_post_quota, assigned_refresh_quota })
             }).then(r=>r.json()).then(json => {
