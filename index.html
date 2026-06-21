@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zameen Listing & Quota Manager</title>
+  <title>NJK Property Magazine - Portal</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -13,16 +13,16 @@
 </head>
 <body class="bg-slate-50 text-slate-800 transition-all duration-300">
 
-  <header class="bg-gradient-to-r应用 bg-emerald-700 to-teal-800 text-white shadow-md">
+  <header class="bg-gradient-to-r bg-blue-700 to-indigo-800 text-white shadow-md">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-3">
       <div class="flex items-center space-x-3">
-        <span class="font-bold text-xl tracking-wide data-translate" data-en="Zameen Portal Engine" data-ur="زمین پورٹل انجن">Zameen Portal Engine</span>
+        <span class="font-bold text-xl tracking-wide data-translate" data-en="NJK Property Magazine" data-ur="این جے کے پراپرٹی میگزین">NJK Property Magazine</span>
       </div>
       <div class="flex items-center space-x-4">
         <button id="langToggleBtn" class="bg-white/20 hover:bg-white/30 text-white font-medium py-1.5 px-4 rounded-lg transition text-sm cursor-pointer border border-white/10 shadow-sm">
           اردو / English
         </button>
-        <span id="userSessionBadge" class="hidden text-xs bg-emerald-900/40 px-3 py-1.5 rounded-md border border-emerald-400/20 font-mono"></span>
+        <span id="userSessionBadge" class="hidden text-xs bg-indigo-900/40 px-3 py-1.5 rounded-md border border-indigo-400/20 font-mono"></span>
         <button id="logoutBtn" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-semibold py-1.5 px-4 rounded-lg transition text-sm cursor-pointer shadow-md data-translate" data-en="Log Out" data-ur="لاگ آؤٹ">Log Out</button>
       </div>
     </div>
@@ -33,24 +33,24 @@
 
     <section id="authView" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-300 mt-10">
       <div class="bg-slate-100 p-4 flex justify-around border-b border-slate-200/60">
-        <button id="switchLoginTab" class="w-1/2 py-2 text-center font-bold text-emerald-700 border-b-2 border-emerald-600 data-translate" data-en="Sign In" data-ur="لاگ ان">Sign In</button>
+        <button id="switchLoginTab" class="w-1/2 py-2 text-center font-bold text-blue-700 border-b-2 border-blue-600 data-translate" data-en="Sign In" data-ur="لاگ ان">Sign In</button>
         <button id="switchRegisterTab" class="w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800 data-translate" data-en="Create Account" data-ur="رجسٹریشن">Create Account</button>
       </div>
       <div class="p-8">
         <form id="authForm" class="space-y-5">
           <div id="nameFieldGroup" class="hidden">
             <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Full Name" data-ur="مکمل نام">Full Name</label>
-            <input type="text" id="authName" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+            <input type="text" id="authName" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50">
           </div>
           <div>
             <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Email Address" data-ur="ای میل ایڈریس">Email Address</label>
-            <input type="email" id="authEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50" placeholder="admin@zameensystem.com">
+            <input type="email" id="authEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50" placeholder="agent@njkmagazine.com">
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Password Crypt Key" data-ur="پاس ورڈ">Password Crypt Key</label>
-            <input type="password" id="authPassword" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50" placeholder="••••••••">
+            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Password" data-ur="پاس ورڈ">Password</label>
+            <input type="password" id="authPassword" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50/50" placeholder="••••••••">
           </div>
-          <button type="submit" id="authSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition transform active:scale-95 cursor-pointer mt-2 data-translate" data-en="Authenticate System Access" data-ur="سسٹم تک رسائی حاصل کریں">Authenticate System Access</button>
+          <button type="submit" id="authSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition transform active:scale-95 cursor-pointer mt-2 data-translate" data-en="Authenticate System Access" data-ur="سسٹم تک رسائی حاصل کریں">Authenticate System Access</button>
         </form>
       </div>
     </section>
@@ -59,101 +59,153 @@
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
-          <div class="p-3.5 bg-emerald-50 rounded-xl text-emerald-600 text-2xl font-bold">P</div>
+          <div class="p-3.5 bg-blue-50 rounded-xl text-blue-600 text-2xl font-bold">P</div>
           <div>
             <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Available Listing Quota" data-ur="دستیاب لسٹنگ کوٹہ">Available Listing Quota</p>
             <h3 id="quotaPostVal" class="text-3xl font-bold text-slate-800">0</h3>
           </div>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
-          <div class="p-3.5 bg-teal-50 rounded-xl text-teal-600 text-2xl font-bold">R</div>
+          <div class="p-3.5 bg-indigo-50 rounded-xl text-indigo-600 text-2xl font-bold">R</div>
           <div>
             <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Refresh Token Points" data-ur="ریفریش ٹوکن پوائنٹس">Refresh Token Points</p>
             <h3 id="quotaRefreshVal" class="text-3xl font-bold text-slate-800">0</h3>
           </div>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
-          <div class="p-3.5 bg-indigo-50 rounded-xl text-indigo-600 text-2xl font-bold">R</div>
+          <div class="p-3.5 bg-slate-50 rounded-xl text-slate-600 text-2xl font-bold">R</div>
           <div>
             <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Account Role Context" data-ur="اکاؤنٹ کا درجہ">Account Role Context</p>
-            <h3 id="accountRoleVal" class="text-2xl font-bold text-indigo-600">Agent</h3>
+            <h3 id="accountRoleVal" class="text-2xl font-bold text-blue-600">Agent</h3>
           </div>
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-5 h-fit">
-          <h2 class="text-lg font-bold border-b pb-3 text-slate-700 flex justify-between items-center">
-            <span class="data-translate" data-en="Post Property Listing" data-ur="پراپرٹی لسٹنگ جمع کریں">Post Property Listing</span>
-          </h2>
-          <form id="postForm" class="space-y-4">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-5 h-fit lg:col-span-1">
+          <h2 class="text-xl font-bold border-b pb-3 text-slate-700 data-translate" data-en="NJK Property Form" data-ur="فارم برائے این جے کے پراپرٹی">NJK Property Form</h2>
+          
+          <form id="propertyForm" class="space-y-4">
             <div>
-              <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Property Title" data-ur="پراپرٹی کا عنوان">Property Title</label>
-              <input type="text" id="pTitle" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
+              <label for="title" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Title" data-ur="عنوان">Title</label>
+              <input type="text" id="title" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
-            <div class="grid grid-cols-2 gap-3">
+
+            <div>
+              <label for="description" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Description" data-ur="تفصیل">Description</label>
+              <textarea id="description" rows="3" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+            </div>
+
+            <div>
+              <label for="propertyType" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Property Type" data-ur="پراپرٹی کی قسم">Property Type</label>
+              <select id="propertyType" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="" disabled selected class="data-translate" data-en="Select Property Type" data-ur="پراپرٹی کی قسم منتخب کریں">Select Property Type</option>
+                <option value="Plot">Plot</option>
+                <option value="Bungalow">Bungalow</option>
+                <option value="Flat">Flat</option>
+                <option value="Shop">Shop</option>
+                <option value="Office">Office</option>
+                <option value="Mezzanine">Mezzanine</option>
+                <option value="Basement">Basement</option>
+                <option value="Building">Building</option>
+                <option value="Factory">Factory</option>
+                <option value="Warehouse">Warehouse</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="location" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Location" data-ur="مقام / لوکیشن">Location</label>
+              <select id="location" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="" disabled selected class="data-translate" data-en="Select Location" data-ur="لوکیشن منتخب کریں">Select Location</option>
+                <option value="DHA Phase">DHA Phase</option>
+                <option value="Clifton Block">Clifton Block</option>
+                <option value="Bahria Town Karachi">Bahria Town Karachi</option>
+                <option value="DHA City Karachi">DHA City Karachi</option>
+                <option value="Korangi Industrial Area">Korangi Industrial Area</option>
+                <option value="Creek Industrial Area">Creek Industrial Area</option>
+                <option value="Landhi Industrial Area">Landhi Industrial Area</option>
+                <option value="Port Qasim">Port Qasim</option>
+                <option value="National Highway">National Highway</option>
+                <option value="Superhighway">Superhighway</option>
+                <option value="Nooriabad">Nooriabad</option>
+                <option value="Site">Site</option>
+                <option value="Site Superhighway Phase">Site Superhighway Phase</option>
+                <option value="Custom Location">Custom Location</option>
+              </select>
+            </div>
+
+            <div id="locationDetailContainer" class="hidden">
+              <label id="locationDetailLabel" for="locationDetail" class="block text-sm font-medium mb-1 text-gray-700">Location Detail</label>
+              <input type="text" id="locationDetail" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+
+            <div>
+              <label for="purpose" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Purpose" data-ur="مقصد">Purpose</label>
+              <select id="purpose" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                <option value="" disabled selected class="data-translate" data-en="Select Purpose" data-ur="مقصد منتخب کریں">Select Purpose</option>
+                <option value="Sale">Sale</option>
+                <option value="Rent">Rent</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Type" data-ur="قسم">Type</label>
-                <select id="pType" class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
-                  <option value="House">House</option>
-                  <option value="Flat">Flat</option>
-                  <option value="Plot">Plot</option>
-                  <option value="Commercial">Commercial</option>
+                <label class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Area Value" data-ur="رقبے کی ویلیو">Area Value</label>
+                <input type="number" id="areaValue" required min="0" step="any" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Unit" data-ur="یونٹ">Unit</label>
+                <select id="areaUnit" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                  <option value="Sqft">Sqft</option>
+                  <option value="Sqyds">Sqyds</option>
+                  <option value="Acre">Acre</option>
                 </select>
               </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Purpose" data-ur="مقصد">Purpose</label>
-                <select id="pPurpose" class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
-                  <option value="For Sale">For Sale</option>
-                  <option value="For Rent">For Rent</option>
-                </select>
-              </div>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Price (PKR)" data-ur="قیمت (روپے)">Price (PKR)</label>
-                <input type="number" id="pPrice" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Area Value" data-ur="رقبہ">Area Value</label>
-                <input type="number" id="pArea" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
-              </div>
+
+            <div id="bedroomsContainer" class="hidden">
+              <label for="bedrooms" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Bedrooms" data-ur="کمرے">Bedrooms</label>
+              <input type="number" id="bedrooms" min="0" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Unit" data-ur="یونٹ">Unit</label>
-                <select id="pUnit" class="w-full px-2 py-2 border rounded-xl bg-slate-50/50 text-xs">
-                  <option value="Marla">Marla</option>
-                  <option value="Kanal">Kanal</option>
-                  <option value="Sq. Ft.">Sq. Ft.</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Bedrooms" data-ur="کمرے">Bedrooms</label>
-                <input type="number" id="pBeds" value="0" class="w-full px-2 py-2 border rounded-xl bg-slate-50/50 text-xs">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Baths" data-ur="باتھ">Baths</label>
-                <input type="number" id="pBaths" value="0" class="w-full px-2 py-2 border rounded-xl bg-slate-50/50 text-xs">
-              </div>
+
+            <div id="bathroomsContainer" class="hidden">
+              <label for="bathrooms" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Bathrooms" data-ur="باتھ رومز">Bathrooms</label>
+              <input type="number" id="bathrooms" min="0" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
+
             <div>
-              <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="City / General Location" data-ur="شہر / عام جگہ">City / General Location</label>
-              <input type="text" id="pLocation" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm" placeholder="e.g. Kot Addu">
+              <label for="price" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Price (PKR)" data-ur="قیمت (روپے)">Price (PKR)</label>
+              <input type="number" id="price" required min="0" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
+
             <div>
-              <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Contact Matrix Number" data-ur="رابطہ نمبر">Contact Matrix Number</label>
-              <input type="text" id="pContact" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm" placeholder="+923000000000">
+              <label for="agentName" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Agent Name" data-ur="ایجنٹ کا نام">Agent Name</label>
+              <input type="text" id="agentName" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm transition tracking-wide shadow cursor-pointer data-translate" data-en="Commit Listing Creation" data-ur="لسٹنگ محفوظ کریں">Commit Listing Creation</button>
+
+            <div>
+              <label for="agencyName" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Agency Name" data-ur="ایجنسی کا نام">Agency Name</label>
+              <input type="text" id="agencyName" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+
+            <div>
+              <label for="contactNumber" class="block text-sm font-medium mb-1 text-gray-700 data-translate" data-en="Contact Number" data-ur="رابطہ نمبر">Contact Number</label>
+              <input type="number" id="contactNumber" required class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium p-3 rounded-lg transition duration-200 cursor-pointer data-translate" data-en="Submit Property" data-ur="پراپرٹی جمع کریں">
+                Submit Property
+              </button>
+            </div>
           </form>
         </div>
 
-        <div class="lg:grid-cols-2 lg:col-span-2 space-y-6">
+        <div class="lg:col-span-2 space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
             <h2 class="text-lg font-bold border-b pb-3 mb-4 text-slate-700 data-translate" data-en="Active Catalog Assets Management" data-ur="آپ کی لسٹنگز کا انتظام">Active Catalog Assets Management</h2>
-            <div id="postsContainer" class="space-y-4 max-h-[550px] overflow-y-auto pr-2">
+            <div id="postsContainer" class="space-y-4 max-h-[650px] overflow-y-auto pr-2">
               </div>
           </div>
         </div>
@@ -169,10 +221,9 @@
   </footer>
 
   <script>
-    // DEFINE THE DEPLOYED BACKEND PROCESSING ACCESS GATEWAY NODE ADDRESS
+    // CORE SCRIPT LINK REGISTRY GATEWAY VALUE
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQOEpgXnlwPoR8ZJBDQ5HSgOonDa8mqwz5U9LWv80oi3FcJHeAngGdHj10FE2RAQwzBw/exec";
 
-    // System Cache Storage Matrix Vector Track state
     let sysState = {
       currentLang: "en",
       activeTab: "login",
@@ -181,7 +232,6 @@
       listings: []
     };
 
-    // UI Translation Coordinates Object Mapper Mapping Pipeline
     const uiDictionary = {
       "en": { dir: "ltr" },
       "ur": { dir: "rtl" }
@@ -190,31 +240,105 @@
     document.addEventListener("DOMContentLoaded", () => {
       initEventListeners();
       evaluateGlobalApplicationStateRoute();
+      initNJKFormConditionalLogic();
     });
 
     function initEventListeners() {
-      // Language Change Controller Interceptor
       document.getElementById("langToggleBtn").addEventListener("click", () => {
         sysState.currentLang = sysState.currentLang === "en" ? "ur" : "en";
         document.documentElement.lang = sysState.currentLang;
         document.documentElement.dir = uiDictionary[sysState.currentLang].dir;
-        
-        // Toggle Urdu structural styling fonts adjustments classes
         if (sysState.currentLang === "ur") {
           document.body.classList.add("lang-ur");
         } else {
           document.body.classList.remove("lang-ur");
         }
-        
         applyUIPhraseTranslationSync();
       });
 
-      // Authentication Tab Switch Engine Interfaces UI Routing Links
       document.getElementById("switchLoginTab").addEventListener("click", () => toggleAuthTabs("login"));
       document.getElementById("switchRegisterTab").addEventListener("click", () => toggleAuthTabs("register"));
       document.getElementById("authForm").addEventListener("submit", handleAuthenticationFormTransactionPipeline);
-      document.getElementById("postForm").addEventListener("submit", handleListingCreationPipelineCommit);
+      document.getElementById("propertyForm").addEventListener("submit", handleListingCreationPipelineCommit);
       document.getElementById("logoutBtn").addEventListener("click", triggerSystemSessionTeardownClearance);
+    }
+
+    function initNJKFormConditionalLogic() {
+      const propertyTypeSelect = document.getElementById('propertyType');
+      const locationSelect = document.getElementById('location');
+      
+      const bedroomsContainer = document.getElementById('bedroomsContainer');
+      const bedroomsInput = document.getElementById('bedrooms');
+      
+      const bathroomsContainer = document.getElementById('bathroomsContainer');
+      const bathroomsInput = document.getElementById('bathrooms');
+      
+      const locationDetailContainer = document.getElementById('locationDetailContainer');
+      const locationDetailLabel = document.getElementById('locationDetailLabel');
+      const locationDetailInput = document.getElementById('locationDetail');
+
+      // Property Type Change Logic Integration
+      propertyTypeSelect.addEventListener('change', function() {
+        const val = this.value;
+
+        // Bedrooms conditional configuration tracking
+        if (val === 'Flat' || val === 'Bungalow') {
+          bedroomsContainer.classList.remove('hidden');
+          bedroomsInput.setAttribute('required', 'required');
+        } else {
+          bedroomsContainer.classList.add('hidden');
+          bedroomsInput.removeAttribute('required');
+          bedroomsInput.value = '';
+        }
+
+        // Bathrooms conditional configuration tracking
+        const allowedBathrooms = ['Flat', 'Bungalow', 'Shop', 'Office', 'Mezzanine', 'Basement'];
+        if (allowedBathrooms.includes(val)) {
+          bathroomsContainer.classList.remove('hidden');
+          bathroomsInput.setAttribute('required', 'required');
+        } else {
+          bathroomsContainer.classList.add('hidden');
+          bathroomsInput.removeAttribute('required');
+          bathroomsInput.value = '';
+        }
+      });
+
+      // Location Change Logic Integration
+      locationSelect.addEventListener('change', function() {
+        const val = this.value;
+
+        if (!val) {
+          locationDetailContainer.classList.add('hidden');
+          locationDetailInput.removeAttribute('required');
+          locationDetailInput.value = '';
+          return;
+        }
+
+        locationDetailContainer.classList.remove('hidden');
+        locationDetailInput.setAttribute('required', 'required');
+
+        // Dynamic Labels Text Content Context Matrix Map
+        switch (val) {
+          case 'DHA Phase':
+            locationDetailLabel.textContent = 'Enter DHA Phase';
+            break;
+          case 'Clifton Block':
+            locationDetailLabel.textContent = 'Enter Clifton Block';
+            break;
+          case 'Bahria Town Karachi':
+            locationDetailLabel.textContent = 'Enter BTK Precinct';
+            break;
+          case 'DHA City Karachi':
+            locationDetailLabel.textContent = 'Enter DCK Sector';
+            break;
+          case 'Custom Location':
+            locationDetailLabel.textContent = 'Enter Custom Location Name';
+            break;
+          default:
+            locationDetailLabel.textContent = `Enter ${val} Area Detail`;
+            break;
+        }
+      });
     }
 
     function applyUIPhraseTranslationSync() {
@@ -231,12 +355,12 @@
       const nGroup = document.getElementById("nameFieldGroup");
       
       if (target === "login") {
-        lTab.className = "w-1/2 py-2 text-center font-bold text-emerald-700 border-b-2 border-emerald-600";
+        lTab.className = "w-1/2 py-2 text-center font-bold text-blue-700 border-b-2 border-blue-600";
         rTab.className = "w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800";
         nGroup.classList.add("hidden");
         document.getElementById("authName").required = false;
       } else {
-        rTab.className = "w-1/2 py-2 text-center font-bold text-emerald-700 border-b-2 border-emerald-600";
+        rTab.className = "w-1/2 py-2 text-center font-bold text-blue-700 border-b-2 border-blue-600";
         lTab.className = "w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800";
         nGroup.classList.remove("hidden");
         document.getElementById("authName").required = true;
@@ -246,7 +370,7 @@
     function displayMessage(msg, isSuccess = false) {
       const box = document.getElementById("alertBox");
       box.className = `p-4 rounded-xl border text-sm font-medium shadow-md transition-all duration-300 transform scale-100 ${
-        isSuccess ? "bg-emerald-50 text-emerald-800 border-emerald-200" : "bg-rose-50 text-rose-800 border-rose-200"
+        isSuccess ? "bg-blue-50 text-blue-800 border-blue-200" : "bg-rose-50 text-rose-800 border-rose-200"
       }`;
       box.textContent = msg;
       box.classList.remove("hidden");
@@ -266,7 +390,6 @@
         return;
       }
 
-      // Fetch User Session Profile Identity context mapping from engine pipeline trace
       try {
         const response = await fetch(`${SCRIPT_URL}?action=profile&method=GET&token=${sysState.token}`);
         const result = await response.json();
@@ -275,11 +398,10 @@
           sysState.profile = result.data;
           renderDashboardWorkspaceLayout();
         } else {
-          // Token identity signature failed security parsing matrix check
           triggerSystemSessionTeardownClearance();
         }
       } catch (err) {
-        displayMessage("Fatal Network System Error Connectivity Interface Exception. Confirm backend script runtime rules permissions mapping config.");
+        displayMessage("Fatal Network System Error Connectivity Interface Exception. Confirm backend script runtime rules configurations.");
       }
     }
 
@@ -312,7 +434,7 @@
             sysState.token = result.data.token;
             await evaluateGlobalApplicationStateRoute();
           } else {
-            displayMessage("Account registration commit finalized. Transitioning authentication gateway tab channel rules parameters.", true);
+            displayMessage("Account registration commit finalized. Transitioning authentication gateway channels.", true);
             toggleAuthTabs("login");
           }
         } else {
@@ -332,7 +454,6 @@
       badge.textContent = `ID: ${sysState.profile.id} [${sysState.profile.name}]`;
       badge.classList.remove("hidden");
 
-      // Balance parameters structural views rendering
       document.getElementById("quotaPostVal").textContent = sysState.profile.assigned_post_quota;
       document.getElementById("quotaRefreshVal").textContent = sysState.profile.assigned_refresh_quota;
       document.getElementById("accountRoleVal").textContent = sysState.profile.role;
@@ -358,7 +479,7 @@
       container.innerHTML = "";
 
       if(sysState.listings.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-sm text-slate-400 font-medium tracking-wide">No catalog database asset index entries located record tracking indices null.</div>`;
+        container.innerHTML = `<div class="p-8 text-center text-sm text-slate-400 font-medium tracking-wide">No catalog database asset index entries located tracking numbers null.</div>`;
         return;
       }
 
@@ -366,22 +487,22 @@
         const wrapper = document.createElement("div");
         wrapper.className = "p-4 border border-slate-100 rounded-xl bg-slate-50/50 hover:bg-slate-50 flex justify-between items-start flex-wrap gap-4 transition shadow-xs";
         
-        // Badging contextual formatting configurations visualization logic check
         let badgeColor = "bg-slate-100 text-slate-600";
         if(p.refresh_level === "Hot") badgeColor = "bg-amber-100 text-amber-700 font-semibold";
         if(p.refresh_level === "Super Hot") badgeColor = "bg-orange-100 text-orange-700 font-bold";
-        if(p.refresh_level === "Titanium") badgeColor = "bg-indigo-100 text-indigo-700 font-extrabold ring-1 ring-indigo-300";
+        if(p.refresh_level === "Titanium") badgeColor = "bg-blue-100 text-blue-700 font-extrabold ring-1 ring-blue-300";
 
         wrapper.innerHTML = `
           <div class="space-y-1">
             <div class="flex items-center space-x-2 flex-wrap gap-1">
               <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">${p.id}</span>
               <span class="text-xs font-medium px-2 py-0.5 rounded ${badgeColor}">${p.refresh_level || 'Standard'}</span>
-              <span class="text-xs font-bold text-emerald-600 font-mono">${Number(p.price).toLocaleString()} PKR</span>
+              <span class="text-xs font-bold text-blue-600 font-mono">${Number(p.price).toLocaleString()} PKR</span>
             </div>
             <h4 class="font-bold text-slate-800 text-sm">${p.title}</h4>
-            <p class="text-xs text-slate-400 font-medium">${p.location} | ${p.area} ${p.area_unit} | Beds: ${p.bedrooms} | Baths: ${p.bathrooms}</p>
-            <p class="text-[11px] text-slate-400 font-mono">Created: ${new Date(p.created_at).toLocaleDateString()}</p>
+            <p class="text-xs text-slate-500 font-medium">${p.location} (${p.location_detail || 'N/A'}) | ${p.property_type} | ${p.purpose}</p>
+            <p class="text-xs text-slate-400 font-medium">Area: ${p.area} ${p.area_unit} | Beds: ${p.bedrooms || 0} | Baths: ${p.bathrooms || 0}</p>
+            <p class="text-[11px] text-slate-400 font-mono">Agent: ${p.agent_name} [${p.agency_name}]</p>
           </div>
           <div class="flex items-center space-x-2">
             <select id="boostTier-${p.id}" class="text-xs border px-2 py-1 rounded bg-white font-medium focus:outline-none">
@@ -389,7 +510,7 @@
               <option value="Super Hot">Super Hot (3 pts)</option>
               <option value="Titanium">Titanium (5 pts)</option>
             </select>
-            <button onclick="commitListingRefreshActionRequest('${p.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1 rounded-lg transition shadow-xs cursor-pointer">Refresh</button>
+            <button onclick="commitListingRefreshActionRequest('${p.id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-1 rounded-lg transition shadow-xs cursor-pointer">Refresh</button>
             <button onclick="triggerListingDeletionPipeline('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs px-2 py-1 rounded-lg transition border border-rose-200/40 cursor-pointer">✕</button>
           </div>
         `;
@@ -401,17 +522,22 @@
       e.preventDefault();
       clearMessage();
 
+      // Mapping 100% inputs parameters matching your form fields
       const payload = {
-        title: document.getElementById("pTitle").value.trim(),
-        property_type: document.getElementById("pType").value,
-        purpose: document.getElementById("pPurpose").value,
-        price: Number(document.getElementById("pPrice").value),
-        area: Number(document.getElementById("pArea").value),
-        area_unit: document.getElementById("pUnit").value,
-        bedrooms: Number(document.getElementById("pBeds").value),
-        bathrooms: Number(document.getElementById("pBaths").value),
-        location: document.getElementById("pLocation").value.trim(),
-        contact_number: document.getElementById("pContact").value.trim(),
+        title: document.getElementById("title").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        property_type: document.getElementById("propertyType").value,
+        location: document.getElementById("location").value,
+        location_detail: document.getElementById("locationDetail").value.trim(),
+        purpose: document.getElementById("purpose").value,
+        price: Number(document.getElementById("price").value),
+        area: Number(document.getElementById("areaValue").value),
+        area_unit: document.getElementById("areaUnit").value,
+        bedrooms: Number(document.getElementById("bedrooms").value) || 0,
+        bathrooms: Number(document.getElementById("bathrooms").value) || 0,
+        agent_name: document.getElementById("agentName").value.trim(),
+        agency_name: document.getElementById("agencyName").value.trim(),
+        contact_number: document.getElementById("contactNumber").value.trim(),
         token: sysState.token
       };
 
@@ -425,14 +551,19 @@
         const result = await response.json();
 
         if (result.success) {
-          document.getElementById("postForm").reset();
-          await evaluateGlobalApplicationStateRoute(); // Refresh profile values dynamic tracking indicators counters parameters context balances
-          displayMessage("Catalog deployment structural asset allocation post trace execution complete.", true);
+          document.getElementById("propertyForm").reset();
+          // Hide dynamic containers manually post reset trigger
+          document.getElementById('bedroomsContainer').classList.add('hidden');
+          document.getElementById('bathroomsContainer').classList.add('hidden');
+          document.getElementById('locationDetailContainer').classList.add('hidden');
+          
+          await evaluateGlobalApplicationStateRoute();
+          displayMessage("NJK Property Magazine asset listing mapped to backend server dataset successfully.", true);
         } else {
-          displayMessage(result.error || "Execution error posting structural unit.");
+          displayMessage(result.error || "Execution error processing backend database record injection workflow.");
         }
       } catch (err) {
-        displayMessage("Fatal operational tracking system exception boundaries pipeline mismatch data parsing.");
+        displayMessage("Fatal operational context exception boundaries data serialization failure.");
       }
     }
 
@@ -471,13 +602,13 @@
 
       try {
         const response = await fetch(`${SCRIPT_URL}?action=posts&method=DELETE&id=${postId}&token=${sysState.token}`, {
-          method: "POST" // CORS handling compatibility bypass wrapper protocol target mapping node rule
+          method: "POST"
         });
         const result = await response.json();
 
         if(result.success) {
           await evaluateGlobalApplicationStateRoute();
-          displayMessage(`Listing row identity entry ${postId} flagged archived offline successfully context parameter pipeline.`, true);
+          displayMessage(`Listing row identity entry ${postId} flagged archived offline successfully.`, true);
         } else {
           displayMessage(result.error || "Access management visibility modification validation error.");
         }
