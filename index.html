@@ -1,677 +1,499 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NJK Property Magazine SaaS Single Core Architecture</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Zameen Listing & Quota Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .lang-ur { font-family: 'Noto Nastaliq Urdu', serif; line-height: 2.5; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 transition-all duration-300">
 
-  <div id="global-loading-barrier" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-[100]">
-    <div class="bg-white px-6 py-4 rounded-xl shadow-2xl border border-slate-100 flex items-center space-x-3 max-w-xs mx-auto">
-      <div class="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-      <span class="text-xs font-mono font-bold tracking-tight text-slate-700 uppercase">Syncing Cloud Node Ledger...</span>
+  <header class="bg-gradient-to-r应用 bg-emerald-700 to-teal-800 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-3">
+      <div class="flex items-center space-x-3">
+        <span class="font-bold text-xl tracking-wide data-translate" data-en="Zameen Portal Engine" data-ur="زمین پورٹل انجن">Zameen Portal Engine</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="langToggleBtn" class="bg-white/20 hover:bg-white/30 text-white font-medium py-1.5 px-4 rounded-lg transition text-sm cursor-pointer border border-white/10 shadow-sm">
+          اردو / English
+        </button>
+        <span id="userSessionBadge" class="hidden text-xs bg-emerald-900/40 px-3 py-1.5 rounded-md border border-emerald-400/20 font-mono"></span>
+        <button id="logoutBtn" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-semibold py-1.5 px-4 rounded-lg transition text-sm cursor-pointer shadow-md data-translate" data-en="Log Out" data-ur="لاگ آؤٹ">Log Out</button>
+      </div>
     </div>
-  </div>
+  </header>
 
-  <div id="app" class="flex-grow flex flex-col">
-    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div class="flex items-center space-x-4 md:space-x-8">
-          <h1 onclick="navigate('portal-home')" class="text-lg md:text-xl font-black tracking-tight text-indigo-600 cursor-pointer whitespace-nowrap">NJK RealEstate</h1>
-          
-          <div class="hidden md:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider text-slate-600">
-            <button onclick="navigate('portal-home')" class="hover:text-indigo-600 transition">Marketplace Home</button>
-            <button onclick="navigate('portal-archive')" class="hover:text-indigo-600 transition">Browse Catalogs</button>
-            <button onclick="navigate('dashboard')" class="hover:text-indigo-600 transition">Agent Workspace</button>
-            <button id="nav-admin-btn" onclick="navigate('admin-panel')" class="hidden bg-red-50 text-red-700 font-black px-2.5 py-1 rounded border border-red-200 hover:bg-red-100 transition">Admin Console</button>
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div id="alertBox" class="hidden mb-6 p-4 rounded-xl border transition-all shadow-md transform scale-95 duration-200"></div>
+
+    <section id="authView" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-300 mt-10">
+      <div class="bg-slate-100 p-4 flex justify-around border-b border-slate-200/60">
+        <button id="switchLoginTab" class="w-1/2 py-2 text-center font-bold text-emerald-700 border-b-2 border-emerald-600 data-translate" data-en="Sign In" data-ur="لاگ ان">Sign In</button>
+        <button id="switchRegisterTab" class="w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800 data-translate" data-en="Create Account" data-ur="رجسٹریشن">Create Account</button>
+      </div>
+      <div class="p-8">
+        <form id="authForm" class="space-y-5">
+          <div id="nameFieldGroup" class="hidden">
+            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Full Name" data-ur="مکمل نام">Full Name</label>
+            <input type="text" id="authName" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Email Address" data-ur="ای میل ایڈریس">Email Address</label>
+            <input type="email" id="authEmail" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50" placeholder="admin@zameensystem.com">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1 text-slate-600 data-translate" data-en="Password Crypt Key" data-ur="پاس ورڈ">Password Crypt Key</label>
+            <input type="password" id="authPassword" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50" placeholder="••••••••">
+          </div>
+          <button type="submit" id="authSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition transform active:scale-95 cursor-pointer mt-2 data-translate" data-en="Authenticate System Access" data-ur="سسٹم تک رسائی حاصل کریں">Authenticate System Access</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="dashboardView" class="hidden space-y-8 animate-fadeIn">
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
+          <div class="p-3.5 bg-emerald-50 rounded-xl text-emerald-600 text-2xl font-bold">P</div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Available Listing Quota" data-ur="دستیاب لسٹنگ کوٹہ">Available Listing Quota</p>
+            <h3 id="quotaPostVal" class="text-3xl font-bold text-slate-800">0</h3>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
+          <div class="p-3.5 bg-teal-50 rounded-xl text-teal-600 text-2xl font-bold">R</div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Refresh Token Points" data-ur="ریفریش ٹوکن پوائنٹس">Refresh Token Points</p>
+            <h3 id="quotaRefreshVal" class="text-3xl font-bold text-slate-800">0</h3>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center space-x-4">
+          <div class="p-3.5 bg-indigo-50 rounded-xl text-indigo-600 text-2xl font-bold">R</div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 data-translate" data-en="Account Role Context" data-ur="اکاؤنٹ کا درجہ">Account Role Context</p>
+            <h3 id="accountRoleVal" class="text-2xl font-bold text-indigo-600">Agent</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-5 h-fit">
+          <h2 class="text-lg font-bold border-b pb-3 text-slate-700 flex justify-between items-center">
+            <span class="data-translate" data-en="Post Property Listing" data-ur="پراپرٹی لسٹنگ جمع کریں">Post Property Listing</span>
+          </h2>
+          <form id="postForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Property Title" data-ur="پراپرٹی کا عنوان">Property Title</label>
+              <input type="text" id="pTitle" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Type" data-ur="قسم">Type</label>
+                <select id="pType" class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
+                  <option value="House">House</option>
+                  <option value="Flat">Flat</option>
+                  <option value="Plot">Plot</option>
+                  <option value="Commercial">Commercial</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Purpose" data-ur="مقصد">Purpose</label>
+                <select id="pPurpose" class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
+                  <option value="For Sale">For Sale</option>
+                  <option value="For Rent">For Rent</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Price (PKR)" data-ur="قیمت (روپے)">Price (PKR)</label>
+                <input type="number" id="pPrice" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Area Value" data-ur="رقبہ">Area Value</label>
+                <input type="number" id="pArea" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm">
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Unit" data-ur="یونٹ">Unit</label>
+                <select id="pUnit" class="w-full px-2 py-2 border rounded-xl bg-slate-50/50 text-xs">
+                  <option value="Marla">Marla</option>
+                  <option value="Kanal">Kanal</option>
+                  <option value="Sq. Ft.">Sq. Ft.</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Bedrooms" data-ur="کمرے">Bedrooms</label>
+                <input type="number" id="pBeds" value="0" class="w-full px-2 py-2 border rounded-xl bg-slate-50/50 text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Baths" data-ur="باتھ">Baths</label>
+                <input type="number" id="pBaths" value="0" class="w-full px-2 py-2 border rounded-xl bg-slate-50/50 text-xs">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="City / General Location" data-ur="شہر / عام جگہ">City / General Location</label>
+              <input type="text" id="pLocation" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm" placeholder="e.g. Kot Addu">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1 text-slate-500 data-translate" data-en="Contact Matrix Number" data-ur="رابطہ نمبر">Contact Matrix Number</label>
+              <input type="text" id="pContact" required class="w-full px-3 py-2 border rounded-xl bg-slate-50/50 text-sm" placeholder="+923000000000">
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-sm transition tracking-wide shadow cursor-pointer data-translate" data-en="Commit Listing Creation" data-ur="لسٹنگ محفوظ کریں">Commit Listing Creation</button>
+          </form>
+        </div>
+
+        <div class="lg:grid-cols-2 lg:col-span-2 space-y-6">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-lg font-bold border-b pb-3 mb-4 text-slate-700 data-translate" data-en="Active Catalog Assets Management" data-ur="آپ کی لسٹنگز کا انتظام">Active Catalog Assets Management</h2>
+            <div id="postsContainer" class="space-y-4 max-h-[550px] overflow-y-auto pr-2">
+              </div>
           </div>
         </div>
 
-        <div class="flex items-center space-x-3">
-          <nav id="nav-auth-actions" class="hidden md:flex items-center space-x-4"></nav>
-          
-          <button onclick="toggleMobileNavMenu()" class="block md:hidden p-2 text-slate-600 hover:text-indigo-600 focus:outline-none" aria-label="Toggle Navigation Menu">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-          </button>
-        </div>
       </div>
+    </section>
 
-      <div id="mobile-nav-drawer" class="hidden md:hidden border-t border-slate-100 bg-white px-4 py-3 space-y-3 shadow-inner text-xs font-bold uppercase tracking-wider text-slate-600">
-        <button onclick="navigate('portal-home'); toggleMobileNavMenu();" class="block w-full text-left py-2 hover:text-indigo-600">Marketplace Home</button>
-        <button onclick="navigate('portal-archive'); toggleMobileNavMenu();" class="block w-full text-left py-2 hover:text-indigo-600">Browse Catalogs</button>
-        <button onclick="navigate('dashboard'); toggleMobileNavMenu();" class="block w-full text-left py-2 hover:text-indigo-600">Agent Workspace</button>
-        <button id="nav-mobile-admin-btn" onclick="navigate('admin-panel'); toggleMobileNavMenu();" class="hidden w-full text-left bg-red-50 text-red-700 font-black px-2 py-2 rounded border border-red-100">Admin Console</button>
-        <hr class="border-slate-100">
-        <div id="nav-mobile-auth-actions" class="space-y-2 pt-1"></div>
-      </div>
-    </header>
+  </main>
 
-    <main class="flex-grow p-4 md:p-8 max-w-7xl w-full mx-auto">
-      <div id="spa-view-mount" class="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 transition-all">
-        </div>
-    </main>
-  </div>
-
-  <footer class="bg-white border-t border-slate-200 text-center py-4 text-[10px] md:text-xs text-slate-400 font-medium px-4">
-    &copy; 2026 NJK Property Magazine Corporation. Consolidated Unified Platform Standard Release Core V5.
+  <footer class="bg-slate-900 text-slate-400 py-6 mt-16 border-t border-slate-800 text-center text-xs tracking-wider">
+    <p class="font-mono uppercase">&copy; 2026 REAL ESTATE RECORD SYSTEM AUTOMATION PIPELINE</p>
+    <p class="text-slate-500 mt-1 font-semibold">A PROJECT BY HNK & SHEEKAN TECH AND STUDIO</p>
   </footer>
 
   <script>
-    // =========================================================================
-    // CORE INITIALIZATION LAYER CONFIG CONNECTIONS
-    // =========================================================================
-    const API_URL = "https://script.google.com/macros/s/AKfycbzDq6gc1Qi41ewkzpBuypltB4UWgy8QeqVqwBCKXt3Khimg1GvGmAm6bCl6jvThE6giQg/exec";
+    // DEFINE THE DEPLOYED BACKEND PROCESSING ACCESS GATEWAY NODE ADDRESS
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQOEpgXnlwPoR8ZJBDQ5HSgOonDa8mqwz5U9LWv80oi3FcJHeAngGdHj10FE2RAQwzBw/exec";
 
-    const state = {
-      token: localStorage.getItem('njk_session_token') || null,
-      user: null,
-      visitorId: localStorage.getItem('njk_visitor_id') || 'vst_' + Math.random().toString(36).substring(2, 11),
-      currentPostDetailId: null,
-      currentEditingPostId: null,
-      activeAdminTab: 'users',
-      filters: { search: '', location: '', property_type: '', purpose: '', max_price: '' }
+    // System Cache Storage Matrix Vector Track state
+    let sysState = {
+      currentLang: "en",
+      activeTab: "login",
+      token: localStorage.getItem("z_system_auth_token") || null,
+      profile: null,
+      listings: []
     };
-    localStorage.setItem('njk_visitor_id', state.visitorId);
 
-    const getLocalWatched = () => JSON.parse(localStorage.getItem('njk_local_watched') || '[]');
-    const saveLocalWatched = (id) => { const w = getLocalWatched(); if(!w.includes(id)){ w.push(id); localStorage.setItem('njk_local_watched', JSON.stringify(w)); } };
+    // UI Translation Coordinates Object Mapper Mapping Pipeline
+    const uiDictionary = {
+      "en": { dir: "ltr" },
+      "ur": { dir: "rtl" }
+    };
 
-    function toggleMobileNavMenu() {
-      document.getElementById('mobile-nav-drawer').classList.toggle('hidden');
-    }
+    document.addEventListener("DOMContentLoaded", () => {
+      initEventListeners();
+      evaluateGlobalApplicationStateRoute();
+    });
 
-    // =========================================================================
-    // CENTRAL SHARED API FRAMEWORK PIPELINES SERVICE MATRIX (GLOBAL HOOKS)
-    // =========================================================================
-    function toggleLoading(show) {
-      document.getElementById('global-loading-barrier').classList.toggle('hidden', !show);
-    }
-
-    async function apiCall(action, method = 'GET', body = null, idParam = null) {
-      toggleLoading(true);
-      let targetUrl = `${API_URL}?action=${action}&method=${method}`;
-      if(state.token) targetUrl += `&token=${encodeURIComponent(state.token)}`;
-      if(idParam) targetUrl += `&id=${encodeURIComponent(idParam)}`;
-      if(action === 'public-posts') {
-        Object.keys(state.filters).forEach(k => { if(state.filters[k]) targetUrl += `&${k}=${encodeURIComponent(state.filters[k])}`; });
-      }
-      if(action === 'public-post-detail') targetUrl += `&visitor_id=${state.visitorId}`;
-
-      try {
-        const options = { method: 'POST', mode: 'cors' };
-        if(body) options.body = JSON.stringify(body);
+    function initEventListeners() {
+      // Language Change Controller Interceptor
+      document.getElementById("langToggleBtn").addEventListener("click", () => {
+        sysState.currentLang = sysState.currentLang === "en" ? "ur" : "en";
+        document.documentElement.lang = sysState.currentLang;
+        document.documentElement.dir = uiDictionary[sysState.currentLang].dir;
         
-        const response = await fetch(targetUrl, body || method === 'POST' ? options : { method: 'GET', mode: 'cors' });
+        // Toggle Urdu structural styling fonts adjustments classes
+        if (sysState.currentLang === "ur") {
+          document.body.classList.add("lang-ur");
+        } else {
+          document.body.classList.remove("lang-ur");
+        }
+        
+        applyUIPhraseTranslationSync();
+      });
+
+      // Authentication Tab Switch Engine Interfaces UI Routing Links
+      document.getElementById("switchLoginTab").addEventListener("click", () => toggleAuthTabs("login"));
+      document.getElementById("switchRegisterTab").addEventListener("click", () => toggleAuthTabs("register"));
+      document.getElementById("authForm").addEventListener("submit", handleAuthenticationFormTransactionPipeline);
+      document.getElementById("postForm").addEventListener("submit", handleListingCreationPipelineCommit);
+      document.getElementById("logoutBtn").addEventListener("click", triggerSystemSessionTeardownClearance);
+    }
+
+    function applyUIPhraseTranslationSync() {
+      document.querySelectorAll(".data-translate").forEach(el => {
+        const textValue = el.getAttribute(`data-${sysState.currentLang}`);
+        if(textValue) el.textContent = textValue;
+      });
+    }
+
+    function toggleAuthTabs(target) {
+      sysState.activeTab = target;
+      const lTab = document.getElementById("switchLoginTab");
+      const rTab = document.getElementById("switchRegisterTab");
+      const nGroup = document.getElementById("nameFieldGroup");
+      
+      if (target === "login") {
+        lTab.className = "w-1/2 py-2 text-center font-bold text-emerald-700 border-b-2 border-emerald-600";
+        rTab.className = "w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800";
+        nGroup.classList.add("hidden");
+        document.getElementById("authName").required = false;
+      } else {
+        rTab.className = "w-1/2 py-2 text-center font-bold text-emerald-700 border-b-2 border-emerald-600";
+        lTab.className = "w-1/2 py-2 text-center font-semibold text-slate-500 hover:text-slate-800";
+        nGroup.classList.remove("hidden");
+        document.getElementById("authName").required = true;
+      }
+    }
+
+    function displayMessage(msg, isSuccess = false) {
+      const box = document.getElementById("alertBox");
+      box.className = `p-4 rounded-xl border text-sm font-medium shadow-md transition-all duration-300 transform scale-100 ${
+        isSuccess ? "bg-emerald-50 text-emerald-800 border-emerald-200" : "bg-rose-50 text-rose-800 border-rose-200"
+      }`;
+      box.textContent = msg;
+      box.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearMessage() {
+      document.getElementById("alertBox").classList.add("hidden");
+    }
+
+    async function evaluateGlobalApplicationStateRoute() {
+      if (!sysState.token) {
+        document.getElementById("authView").classList.remove("hidden");
+        document.getElementById("dashboardView").classList.add("hidden");
+        document.getElementById("logoutBtn").classList.add("hidden");
+        document.getElementById("userSessionBadge").classList.add("hidden");
+        return;
+      }
+
+      // Fetch User Session Profile Identity context mapping from engine pipeline trace
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=profile&method=GET&token=${sysState.token}`);
         const result = await response.json();
         
-        if(!result.success) {
-          alert(`Operational Execution Rejection: ${result.error}`);
-          if(result.code === 401) logout();
-          return null;
-        }
-        return result.data;
-      } catch (err) {
-        alert("Fatal core transmission network protocol disruption anomaly.");
-        return null;
-      } finally {
-        toggleLoading(false);
-      }
-    }
-
-    // =========================================================================
-    // CENTRALIZED CENTRAL SPA NAVIGATION MATRIX ROUTER
-    // =========================================================================
-    async function navigate(view) {
-      const mount = document.getElementById('spa-view-mount');
-      const adminBtn = document.getElementById('nav-admin-btn');
-      const mobileAdminBtn = document.getElementById('nav-mobile-admin-btn');
-      updateAuthNavbar();
-
-      if(state.user && state.user.role === 'Admin') {
-        adminBtn.classList.remove('hidden');
-        mobileAdminBtn.classList.remove('hidden');
-      } else {
-        adminBtn.classList.add('hidden');
-        mobileAdminBtn.classList.add('hidden');
-      }
-
-      switch(view) {
-        case 'portal-home':
-          mount.innerHTML = renderPortalHomeTemplate();
-          const pData = await apiCall('public-posts', 'GET');
-          if(pData) document.getElementById('home-featured-grid').innerHTML = buildPropertyCardsGridHtml(pData.slice(0,3));
-          break;
-        case 'portal-archive':
-          mount.innerHTML = renderPortalArchiveLayoutTemplate();
-          const archiveData = await apiCall('public-posts', 'GET');
-          if(archiveData) {
-            document.getElementById('archive-count-label').innerText = `${archiveData.length} Authenticated Property Node Entries Active inside Database Mapping Arrays.`;
-            document.getElementById('archive-listings-grid').innerHTML = buildPropertyCardsGridHtml(archiveData);
-          }
-          break;
-        case 'portal-detail':
-          const dItem = await apiCall('public-post-detail', 'GET', null, state.currentPostDetailId);
-          if(dItem) { saveLocalWatched(dItem.id); mount.innerHTML = renderSinglePropertyViewPage(dItem); }
-          break;
-        case 'login': mount.innerHTML = renderLoginGateTemplate(); break;
-        case 'signup': mount.innerHTML = renderSignupGateTemplate(); break;
-        case 'dashboard':
-          if(!state.token) { navigate('login'); return; }
-          const profile = await apiCall('profile', 'GET');
-          const agentPosts = await apiCall('posts', 'GET');
-          if(profile && agentPosts) { state.user = profile; mount.innerHTML = renderAgentDashboardWorkspace(profile, agentPosts); }
-          break;
-        case 'create-post':
-          state.currentEditingPostId = null;
-          mount.innerHTML = renderListingFormTemplate("Publish Premium Database Listing Row Node", "Append Spreadsheet Entry Block");
-          break;
-        case 'edit-post':
-          const postToEdit = await apiCall('posts', 'GET', null, state.currentEditingPostId);
-          if(postToEdit) mount.innerHTML = renderListingFormTemplate("Modify Architectural Structural Parameters Data", "Synchronize Spreadsheet Parameters Matrix", postToEdit);
-          break;
-        case 'admin-panel':
-          if(!state.token || state.user.role !== 'Admin') { navigate('portal-home'); return; }
-          mount.innerHTML = renderAdminConsoleLayoutFrame();
-          executeAdminTabNavigation(state.activeAdminTab);
-          break;
-      }
-    }
-
-    function updateAuthNavbar() {
-      const target = document.getElementById('nav-auth-actions');
-      const mobileTarget = document.getElementById('nav-mobile-auth-actions');
-      
-      const authHtml = state.token 
-        ? `<button onclick="logout()" class="w-full md:w-auto text-center text-xs font-bold text-red-600 uppercase border border-red-200 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition">Kill Session</button>`
-        : `
-          <button onclick="navigate('login')" class="block md:inline-block w-full md:w-auto text-left md:text-center text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-indigo-600 transition py-2 md:px-3">Sign In</button>
-          <button onclick="navigate('signup')" class="block md:inline-block w-full md:w-auto text-center text-xs font-bold uppercase tracking-wider bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow-sm">Register</button>
-        `;
-        
-      target.innerHTML = authHtml;
-      mobileTarget.innerHTML = authHtml;
-    }
-
-    function logout() { state.token = null; state.user = null; localStorage.removeItem('njk_session_token'); navigate('portal-home'); }
-
-    // =========================================================================
-    // AGENT CONTROLLERS ACTIONS INTERFACE HANDLERS
-    // =========================================================================
-    async function handleAuthPipelineSubmission(e, routeAction) {
-      e.preventDefault();
-      const payload = { email: document.getElementById('auth-email').value, password: document.getElementById('auth-pass').value };
-      if(routeAction === 'register') payload.name = document.getElementById('auth-name').value;
-      
-      const resData = await apiCall(routeAction, 'POST', payload);
-      if(resData) {
-        if(routeAction === 'login') {
-          state.token = resData.token; localStorage.setItem('njk_session_token', resData.token);
-          const p = await apiCall('profile', 'GET'); if(p) { state.user = p; navigate(p.role === 'Admin'?'admin-panel':'dashboard'); }
+        if (result.success) {
+          sysState.profile = result.data;
+          renderDashboardWorkspaceLayout();
         } else {
-          alert("Registration matrix completed successfully. Invoke login access handshake parameter blocks."); navigate('login');
+          // Token identity signature failed security parsing matrix check
+          triggerSystemSessionTeardownClearance();
         }
+      } catch (err) {
+        displayMessage("Fatal Network System Error Connectivity Interface Exception. Confirm backend script runtime rules permissions mapping config.");
       }
     }
 
-    async function handlePropertyDataRowCommit(e) {
+    async function handleAuthenticationFormTransactionPipeline(e) {
       e.preventDefault();
+      clearMessage();
+      
       const payload = {
-        title: document.getElementById('p-title').value, description: document.getElementById('p-desc').value,
-        property_type: document.getElementById('p-type').value, purpose: document.getElementById('p-purpose').value,
-        price: document.getElementById('p-price').value, area: document.getElementById('p-area').value, area_unit: document.getElementById('p-unit').value,
-        bedrooms: document.getElementById('p-beds').value, bathrooms: document.getElementById('p-baths').value,
-        location: document.getElementById('p-loc').value, location_detail: document.getElementById('p-loc-det').value,
-        contact_number: document.getElementById('p-phone').value
+        email: document.getElementById("authEmail").value.trim(),
+        password: document.getElementById("authPassword").value
       };
-      const act = state.currentEditingPostId ? 'posts' : 'posts';
-      const meth = state.currentEditingPostId ? 'PUT' : 'POST';
-      const r = await apiCall(act, meth, payload, state.currentEditingPostId);
-      if(r) { alert("Spreadsheet record mapping synchronization verified transaction clear."); navigate('dashboard'); }
-    }
-
-    async function invokeSoftArchiveDeletion(id) {
-      if(confirm("Flag target data spreadsheet row index reference offline to hidden visibility metrics?")) {
-        if(await apiCall('posts', 'DELETE', null, id)) navigate('dashboard');
+      
+      const targetAction = sysState.activeTab === "login" ? "login" : "register";
+      if (targetAction === "register") {
+        payload.name = document.getElementById("authName").value.trim();
       }
-    }
 
-    async function submitAgentQuotaClaim(e) {
-      e.preventDefault();
-      const payload = { requested_posts: document.getElementById('req-p').value, requested_refresh: document.getElementById('req-r').value };
-      if(await apiCall('quota-request', 'POST', payload)) { alert("Claim row logged inside backend ledger sheets workflows."); navigate('dashboard'); }
-    }
-
-    async function acquireProductBundleIntent(dealId) {
-      if(confirm("Authorize structural system ledger purchase processing execution tracing sequence pipeline?")) {
-        if(await apiCall('deal-request', 'POST', { deal_id: dealId })) { alert("Purchase file queued verification checks path pending."); navigate('dashboard'); }
-      }
-    }
-
-    async function processInstantBoostAllocation(postId) {
-      const tier = document.getElementById(`boost-select-${postId}`).value;
-      if(!tier) return;
-      if(confirm(`Commit balance point updates to modify badging configuration to ${tier} status layers?`)) {
-        if(await apiCall('refresh-post', 'POST', { post_id: postId, refresh_level: tier })) { alert("Optimization layer deployed."); navigate('dashboard'); }
-      }
-    }
-
-    // =========================================================================
-    // PUBLIC COMPONENT HTML LAYOUT GENERATION PATTERNS
-    // =========================================================================
-    function renderPortalHomeTemplate() {
-      return `
-        <div class="text-center py-10 md:py-16 bg-gradient-to-tr from-slate-900 via-indigo-950 to-slate-900 rounded-2xl md:rounded-3xl text-white px-4 shadow-xl mb-8 md:mb-12">
-          <h2 class="text-xl md:text-3xl font-black mb-2 uppercase tracking-tight">Unified Property Discovery Engine</h2>
-          <p class="text-[11px] md:text-xs text-indigo-200/80 max-w-lg mx-auto mb-6 md:mb-8 font-medium">Real-time listing matrix prioritized by tier indexing structures tracking live spreadsheet data pipelines directly.</p>
-          <div class="max-w-xl mx-auto bg-white p-1.5 rounded-xl shadow-lg flex flex-col sm:flex-row gap-2 border">
-            <input type="text" id="home-search-field" placeholder="Enter keywords, structural addresses, features..." class="w-full text-slate-800 px-4 py-2 focus:outline-none text-xs font-medium rounded-lg">
-            <button onclick="state.filters.search=document.getElementById('home-search-field').value; navigate('portal-archive');" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-lg text-xs uppercase tracking-wider transition">Search</button>
-          </div>
-        </div>
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-          <h3 class="text-xs font-black uppercase tracking-widest text-slate-400">Featured Real Estate Nodes</h3>
-          <button onclick="navigate('portal-archive')" class="text-xs font-bold text-indigo-600 underline hover:text-indigo-700 transition">View Full Database Stack &rarr;</button>
-        </div>
-        <div id="home-featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>`;
-    }
-
-    function renderPortalArchiveLayoutTemplate() {
-      return `
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div class="bg-slate-50 p-4 md:p-6 rounded-2xl border space-y-4 h-fit">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400 mb-2">Filters Matrix Parameters</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-              <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Keyword Title Search</label><input type="text" id="f-search" value="${state.filters.search}" class="w-full text-xs px-3 py-2 border rounded-lg bg-white"></div>
-              <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Target Location</label><input type="text" id="f-loc" value="${state.filters.location}" class="w-full text-xs px-3 py-2 border rounded-lg bg-white" placeholder="Lahore, Karachi..."></div>
-              <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Property Layout</label><select id="f-type" class="w-full text-xs px-3 py-2 border rounded-lg bg-white font-medium"><option value="">All Structural Categories</option><option value="House">House</option><option value="Flat">Flat</option><option value="Commercial">Commercial</option><option value="Plot">Plot</option></select></div>
-              <div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Deal Purpose</label><select id="f-purpose" class="w-full text-xs px-3 py-2 border rounded-lg bg-white font-medium"><option value="">All Vectors</option><option value="For Sale">For Sale</option><option value="For Rent">For Rent</option></select></div>
-              <div class="sm:col-span-2 lg:col-span-1"><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Max Price Ceiling Threshold (PKR)</label><input type="number" id="f-price" value="${state.filters.max_price}" class="w-full text-xs px-3 py-2 border rounded-lg bg-white"></div>
-            </div>
-            <button onclick="state.filters={search:document.getElementById('f-search').value,location:document.getElementById('f-loc').value,property_type:document.getElementById('f-type').value,purpose:document.getElementById('f-purpose').value,max_price:document.getElementById('f-price').value}; navigate('portal-archive');" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 rounded-lg transition uppercase tracking-wider shadow-sm">Execute Constraints</button>
-          </div>
-          <div class="lg:col-span-3 space-y-4">
-            <div id="archive-count-label" class="text-xs font-mono font-bold text-slate-400">Evaluating platform assets inventory data maps...</div>
-            <div id="archive-listings-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
-          </div>
-        </div>`;
-    }
-
-    function buildPropertyCardsGridHtml(list) {
-      if(list.length === 0) return `<div class="col-span-full text-center py-12 text-slate-400 font-mono text-xs border border-dashed rounded-xl bg-slate-50">No structural row entities verify query matches.</div>`;
-      let html = ''; const watched = getLocalWatched();
-      list.forEach(p => {
-        const hasWatched = watched.includes(p.id) ? `<span class="bg-slate-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded border border-slate-700 shrink-0">👀 WATCHED</span>` : '';
-        const level = Number(p.refresh_level) || 0;
-        let b = `<span class="bg-slate-100 text-slate-500 text-[9px] px-1.5 py-0.5 rounded font-bold uppercase shrink-0">Standard</span>`;
-        if(level === 10) b = `<span class="bg-purple-600 text-white text-[9px] px-1.5 py-0.5 rounded font-black tracking-wider uppercase animate-pulse shrink-0">⚡ Titanium</span>`;
-        else if(level === 7) b = `<span class="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded font-black tracking-wider uppercase shrink-0">🔥 Super Hot</span>`;
-        else if(level === 5) b = `<span class="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase shrink-0">💥 Hot</span>`;
-        else if(level === 1) b = `<span class="bg-blue-500 text-white text-[9px] px-1.5 py-0.5 rounded font-medium uppercase shrink-0">Boosted</span>`;
-
-        html += `
-          <div class="border rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition flex flex-col justify-between">
-            <div class="p-4 md:p-5 space-y-2">
-              <div class="flex items-center space-x-1.5 overflow-x-auto pb-1">${b} ${hasWatched}</div>
-              <h4 onclick="state.currentPostDetailId='${p.id}'; navigate('portal-detail');" class="text-sm md:text-base font-black text-slate-900 hover:text-indigo-600 cursor-pointer line-clamp-1 transition uppercase">${p.title}</h4>
-              <p class="text-xs text-slate-400 line-clamp-2 font-medium">${p.description}</p>
-              <div class="bg-slate-50 p-2.5 rounded-lg text-[11px] font-mono font-bold text-slate-500 space-y-0.5">
-                <div class="truncate">Hub: <span class="text-slate-800 font-sans">${p.location} (${p.location_detail})</span></div>
-                <div class="truncate">Config: <span class="text-slate-800 font-sans">${p.area} ${p.area_unit} &bull; ${p.bedrooms}B / ${p.bathrooms}B</span></div>
-              </div>
-            </div>
-            <div class="p-4 border-t bg-slate-50/50 flex justify-between items-center gap-2">
-              <div class="text-xs md:text-sm font-black text-indigo-600 truncate">PKR ${Number(p.price).toLocaleString()}</div>
-              <button onclick="state.currentPostDetailId='${p.id}'; navigate('portal-detail');" class="bg-white border font-bold text-xs px-3 py-1 rounded-lg shadow-sm hover:bg-slate-50 transition shrink-0">Inspect</button>
-            </div>
-          </div>`;
-      });
-      return html;
-    }
-
-    function renderSinglePropertyViewPage(p) {
-      const waMsg = encodeURIComponent(`Inquiry trace regarding property catalog entry: ${p.title} (Ref: ${p.id}). Verify current market availability configurations.`);
-      return `
-        <div class="max-w-4xl mx-auto space-y-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b pb-4">
-            <button onclick="navigate('portal-archive')" class="text-xs font-bold text-slate-500 hover:text-slate-900 transition">&larr; Back to Catalog Data Stack</button>
-            <span class="text-[10px] md:text-[11px] font-mono font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-full">📊 Telemetry Metrics: ${p.total_views} Live Read Impressions</span>
-          </div>
-          <div class="space-y-1">
-            <div class="flex items-center space-x-2"><span class="bg-slate-950 text-white text-[9px] font-mono tracking-widest px-2 py-0.5 rounded font-bold uppercase">System Analytics Tracked</span></div>
-            <h2 class="text-xl md:text-2xl font-black text-slate-900 uppercase">${p.title}</h2>
-            <div class="text-base md:text-lg font-black text-indigo-600">PKR ${Number(p.price).toLocaleString()} Valuation Point</div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 bg-slate-50 p-4 border rounded-xl text-xs font-mono font-bold text-slate-500">
-            <div class="bg-white p-2.5 rounded-lg border border-slate-100">Target City: <div class="text-slate-900 font-sans text-sm font-bold mt-0.5">${p.location}</div></div>
-            <div class="bg-white p-2.5 rounded-lg border border-slate-100">Detailed Sector: <div class="text-slate-900 font-sans text-sm font-bold mt-0.5">${p.location_detail}</div></div>
-            <div class="bg-white p-2.5 rounded-lg border border-slate-100">Blueprint Grid: <div class="text-slate-900 font-sans text-sm font-bold mt-0.5">${p.property_type} (${p.purpose})</div></div>
-            <div class="bg-white p-2.5 rounded-lg border border-slate-100">Volumetric Bounds: <div class="text-slate-900 font-sans text-sm font-bold mt-0.5">${p.area} ${p.area_unit}</div></div>
-            <div class="bg-white p-2.5 rounded-lg border border-slate-100">Bedrooms Config: <div class="text-slate-900 font-sans text-sm font-bold mt-0.5">${p.bedrooms} Beds</div></div>
-            <div class="bg-white p-2.5 rounded-lg border border-slate-100">Bathrooms Unit: <div class="text-slate-900 font-sans text-sm font-bold mt-0.5">${p.bathrooms} Baths</div></div>
-          </div>
-          <div class="space-y-2">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Deep Structural Log Summary</h3>
-            <p class="text-slate-700 text-xs md:text-sm bg-white border p-4 rounded-xl leading-relaxed shadow-sm font-medium whitespace-pre-line">${p.description}</p>
-          </div>
-          <div class="bg-slate-900 text-white p-4 md:p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div class="w-full md:w-auto">
-              <span class="text-[9px] tracking-widest font-mono font-bold text-indigo-400 block uppercase">Assigned Listing Agent Node</span>
-              <h4 class="text-base font-black truncate">${p.agent_name}</h4>
-              <div class="text-xs text-slate-400 font-medium truncate">${p.agency_name || 'Independent Corporate Verification Consultant'}</div>
-            </div>
-            <a href="https://wa.me/${p.contact_number}?text=${waMsg}" target="_blank" class="w-full md:w-auto text-center bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl font-bold text-xs tracking-wide uppercase transition shadow flex items-center justify-center space-x-2 shrink-0">
-              <span>💬 Open WhatsApp Gateway</span>
-            </a>
-          </div>
-        </div>`;
-    }
-
-    // =========================================================================
-    // SYSTEM LOGIN / REGISTER WORKSPACE HTML WRAPPERS
-    // =========================================================================
-    function renderLoginGateTemplate() { return `<div class="max-w-sm mx-auto py-4 md:py-8 space-y-4"><h3 class="text-sm font-black uppercase tracking-wider text-slate-900 border-b pb-2">Authentication Gateway</h3><form onsubmit="handleAuthPipelineSubmission(event, 'login')" class="space-y-4 text-xs"><div><label class="block font-bold mb-1 text-slate-600">Corporate Email Address</label><input type="email" id="auth-email" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:outline-none bg-white"></div><div><label class="block font-bold mb-1 text-slate-600">Password Pass String</label><input type="password" id="auth-pass" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:outline-none bg-white"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg text-xs tracking-wider uppercase shadow hover:bg-indigo-700 transition">Request Handshake Token</button></form><p class="text-[11px] text-center text-slate-400 font-medium pt-2">New platform agent? <span onclick="navigate('signup')" class="text-indigo-600 font-bold underline cursor-pointer">Register identity cell.</span></p></div>`; }
-    function renderSignupGateTemplate() { return `<div class="max-w-sm mx-auto py-4 md:py-8 space-y-4"><h3 class="text-sm font-black uppercase tracking-wider text-slate-900 border-b pb-2">Ecosystem Node Registry</h3><form onsubmit="handleAuthPipelineSubmission(event, 'register')" class="space-y-4 text-xs"><div><label class="block font-bold mb-1 text-slate-600">Public Display Identity Name</label><input type="text" id="auth-name" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:outline-none bg-white"></div><div><label class="block font-bold mb-1 text-slate-600">Ecosystem Email Account</label><input type="email" id="auth-email" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:outline-none bg-white"></div><div><label class="block font-bold mb-1 text-slate-600">Secret Passphrase Sequence</label><input type="password" id="auth-pass" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:outline-none bg-white"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg text-xs tracking-wider uppercase shadow hover:bg-indigo-700 transition">Commit Matrix Configuration Row</button></form></div>`; }
-    
-    function renderListingFormTemplate(title, btnText, data = {}) {
-      return `
-        <div class="max-w-2xl mx-auto space-y-4 text-xs">
-          <h3 class="text-sm font-black uppercase text-slate-900 border-b pb-2">${title}</h3>
-          <form onsubmit="handlePropertyDataRowCommit(event)" class="space-y-4 bg-slate-50 p-4 md:p-6 rounded-2xl border">
-            <div><label class="block font-bold mb-1 text-slate-600">Listing Display Header Text *</label><input type="text" id="p-title" value="${data.title||''}" required class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></div>
-            <div><label class="block font-bold mb-1 text-slate-600">Listing Descriptive Inclusions Text Summary</label><textarea id="p-desc" class="w-full px-3 py-2 border rounded-lg bg-white h-24 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">${data.description||''}</textarea></div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div><label class="block font-bold mb-1 text-slate-600">Structural Framework *</label><select id="p-type" class="w-full px-3 py-2 border rounded-lg bg-white font-bold focus:outline-none"><option value="House" ${data.property_type==='House'?'selected':''}>House</option><option value="Flat" ${data.property_type==='Flat'?'selected':''}>Flat</option><option value="Commercial" ${data.property_type==='Commercial'?'selected':''}>Commercial</option><option value="Plot" ${data.property_type==='Plot'?'selected':''}>Plot</option></select></div>
-              <div><label class="block font-bold mb-1 text-slate-600">Intent Purpose *</label><select id="p-purpose" class="w-full px-3 py-2 border rounded-lg bg-white font-bold focus:outline-none"><option value="For Sale" ${data.purpose==='For Sale'?'selected':''}>For Sale</option><option value="For Rent" ${data.purpose==='For Rent'?'selected':''}>For Rent</option></select></div>
-              <div><label class="block font-bold mb-1 text-slate-600">Price (PKR) *</label><input type="number" id="p-price" value="${data.price||''}" required class="w-full px-3 py-2 border rounded-lg bg-white font-bold focus:outline-none"></div>
-            </div>
-            
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div><label class="block font-bold mb-1 text-slate-600">Volumetric Index *</label><input type="number" id="p-area" value="${data.area||''}" required class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none"></div>
-              <div><label class="block font-bold mb-1 text-slate-600">Unit Dimension *</label><select id="p-unit" class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none"><option value="Marla">Marla</option><option value="Kanal">Kanal</option></select></div>
-              <div><label class="block font-bold mb-1 text-slate-600">Beds Layout</label><input type="number" id="p-beds" value="${data.bedrooms||0}" class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none"></div>
-              <div><label class="block font-bold mb-1 text-slate-600">Baths Layout</label><input type="number" id="p-baths" value="${data.bathrooms||0}" class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none"></div>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div><label class="block font-bold mb-1 text-slate-600">City Hub Coordinate *</label><input type="text" id="p-loc" value="${data.location||''}" required class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none"></div>
-              <div><label class="block font-bold mb-1 text-slate-600">Boundary Sector *</label><input type="text" id="p-loc-det" value="${data.location_detail||''}" required class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none"></div>
-              <div><label class="block font-bold mb-1 text-slate-600">Target Phone *</label><input type="text" id="p-phone" value="${data.contact_number||''}" required class="w-full px-3 py-2 border rounded-lg bg-white focus:outline-none"></div>
-            </div>
-            
-            <div class="pt-2 flex justify-end space-x-2"><button type="button" onclick="navigate('dashboard')" class="px-4 py-2 border rounded-lg font-bold text-slate-500 hover:bg-slate-100 transition">Abort</button><button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded-lg font-black tracking-wide uppercase shadow-sm hover:bg-indigo-700 transition">${btnText}</button></div>
-          </form>
-        </div>`;
-    }
-
-    // =========================================================================
-    // INTEGRATED SUBSCRIPTION MARKETPLACE & ACCOUNT BALANCES INTERFACES
-    // =========================================================================
-    function renderAgentDashboardWorkspace(user, posts) {
-      let rows = '';
-      posts.forEach(p => {
-        if(p.status === 'archived') return;
-        rows += `
-          <tr class="text-xs border-b border-slate-100 font-medium hover:bg-slate-50/50">
-            <td class="px-3 md:px-4 py-3 font-mono font-bold text-slate-400">${p.id}</td>
-            <td class="px-3 md:px-4 py-3 text-slate-900 font-bold max-w-[180px] sm:max-w-none truncate">${p.title} <div class="text-[10px] text-indigo-500 font-mono mt-0.5">Tier: [ ${p.refresh_level || 'Standard'} ]</div></td>
-            <td class="px-3 md:px-4 py-3 font-bold text-slate-600 whitespace-nowrap">PKR ${Number(p.price).toLocaleString()}</td>
-            <td class="px-3 md:px-4 py-3">
-              <div class="flex items-center space-x-1">
-                <select id="boost-select-${p.id}" class="px-1.5 py-1 border rounded bg-white text-[10px] font-bold focus:outline-none"><option value="">Select Tier</option><option value="Normal">Normal (-1)</option><option value="Hot">Hot (-2)</option><option value="Super Hot">Super Hot (-3)</option><option value="Titanium">Titanium (-5)</option></select>
-                <button onclick="processInstantBoostAllocation('${p.id}')" class="bg-slate-950 hover:bg-slate-800 text-white font-bold text-[9px] px-2 py-1 rounded transition">Apply</button>
-              </div>
-            </td>
-            <td class="px-3 md:px-4 py-3 text-right space-x-2 whitespace-nowrap">
-              <button onclick="state.currentEditingPostId='${p.id}'; navigate('edit-post');" class="text-indigo-600 hover:underline font-bold">Edit</button>
-              <button onclick="invokeSoftArchiveDeletion('${p.id}')" class="text-red-500 hover:underline font-bold">Archive</button>
-            </td>
-          </tr>`;
-      });
-
-      return `
-        <div class="space-y-6 md:space-y-8">
-          <div class="border-b pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <h2 class="text-base md:text-lg font-black text-slate-950 uppercase">Agent Workspace</h2>
-              <p class="text-xs text-slate-400 font-medium">Session Context: <span class="text-indigo-600 font-bold">${user.name} (${user.role})</span></p>
-            </div>
-            <button onclick="navigate('create-post')" class="w-full sm:w-auto bg-indigo-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm hover:bg-indigo-700 transition uppercase tracking-wider text-center">+ Deploy New Ad</button>
-          </div>
-          
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="bg-indigo-50/70 p-4 border border-indigo-100 rounded-xl"><span class="block text-[10px] font-black uppercase text-indigo-400 tracking-wider">Remaining Post Capacity Units</span><span class="text-xl md:text-2xl font-mono font-black text-indigo-950">${user.assigned_post_quota} Balance Rows</span></div>
-            <div class="bg-emerald-50/70 p-4 border border-emerald-100 rounded-xl"><span class="block text-[10px] font-black uppercase text-emerald-400 tracking-wider">Available Optimization Token Points</span><span class="text-xl md:text-2xl font-mono font-black text-emerald-950">${user.assigned_refresh_quota} Refresh Points</span></div>
-          </div>
-          
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 border rounded-xl bg-white overflow-x-auto shadow-sm">
-              <div class="p-3 bg-slate-50 font-bold text-[10px] md:text-[11px] text-slate-400 border-b uppercase tracking-wider sticky left-0">Submissions Ledger Matrix</div>
-              <table class="w-full text-left border-collapse min-w-[500px]">
-                <thead><tr class="bg-slate-100/40 text-[10px] font-black text-slate-400 uppercase border-b border-slate-100"><th class="px-4 py-2">ID</th><th class="px-4 py-2">Configuration Specification</th><th class="px-4 py-2">Price</th><th class="px-4 py-2">Visibility Tools</th><th class="px-4 py-2 text-right">Actions</th></tr></thead>
-                <tbody>${rows?rows:'<tr><td colspan="5" class="text-center py-8 text-slate-400 font-mono text-xs">No active mapping rows bound to credentials identity.</td></tr>'}</tbody>
-              </table>
-            </div>
-            <div class="space-y-4">
-              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60 space-y-2">
-                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">Manual Refills Request</h3>
-                <form onsubmit="submitAgentQuotaClaim(event)" class="space-y-2 text-[11px]">
-                  <div class="grid grid-cols-2 gap-2">
-                    <div><label class="block mb-0.5 font-bold text-slate-500">Posts Count</label><input type="number" id="req-p" value="0" class="w-full p-2 border rounded bg-white focus:outline-none"></div>
-                    <div><label class="block mb-0.5 font-bold text-slate-500">Refresh Points</label><input type="number" id="req-r" value="0" class="w-full p-2 border rounded bg-white focus:outline-none"></div>
-                  </div>
-                  <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded uppercase tracking-wide transition shadow-sm">Route Claim Request</button>
-                </form>
-              </div>
-              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/60">
-                <h3 class="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Commercial Subscription Store</h3>
-                <div class="space-y-2" id="store-bundles-widget-mount">
-                  <button onclick="mountWidgetBundlesStore()" class="w-full text-center bg-white py-2 border border-dashed rounded font-bold text-xs text-indigo-600 hover:bg-slate-100/50 transition">Query Available Packages</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    async function mountWidgetBundlesStore() {
-      const parent = document.getElementById('store-bundles-widget-mount'); if(!parent) return;
-      const data = await apiCall('deal', 'GET');
-      if(data) {
-        let html = '<div class="space-y-2 max-h-[250px] overflow-y-auto pr-1">';
-        data.forEach(d => {
-          html += `
-            <div class="bg-white border p-3 rounded-lg text-[11px] space-y-1.5 flex flex-col justify-between shadow-sm">
-              <div>
-                <div class="font-black text-slate-900">${d.title}</div>
-                <div class="text-[10px] text-slate-400 line-clamp-1 font-medium">${d.description}</div>
-                <div class="text-indigo-600 font-mono font-bold mt-1 bg-indigo-50/50 px-1.5 py-0.5 rounded text-[10px] w-fit">Grants: +${d.post_quota} Posts / +${d.refresh_quota} Refreshes</div>
-              </div>
-              <button onclick="acquireProductBundleIntent('${d.id}')" class="w-full bg-slate-950 hover:bg-slate-800 text-white font-bold py-1.5 rounded text-[10px] uppercase tracking-wider transition shadow-sm">Buy PKR ${Number(d.price).toLocaleString()}</button>
-            </div>`;
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=${targetAction}&method=POST`, {
+          method: "POST",
+          mode: "cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
         });
-        parent.innerHTML = html + '</div>';
+        const result = await response.json();
+
+        if (result.success) {
+          if (targetAction === "login") {
+            localStorage.setItem("z_system_auth_token", result.data.token);
+            sysState.token = result.data.token;
+            await evaluateGlobalApplicationStateRoute();
+          } else {
+            displayMessage("Account registration commit finalized. Transitioning authentication gateway tab channel rules parameters.", true);
+            toggleAuthTabs("login");
+          }
+        } else {
+          displayMessage(result.error || "Authentication structural parsing processing failure.");
+        }
+      } catch (err) {
+        displayMessage("Fatal network pipeline mapping boundary check failed processing transmission.");
       }
     }
 
-    // =========================================================================
-    // SYSTEM BACK-OFFICE CENTRAL ADMINISTRATIVE TELEMETRY CONSOLE FRAMEWORK
-    // =========================================================================
-    function renderAdminConsoleLayoutFrame() {
-      return `
-        <div>
-          <div class="mb-6 border-b border-slate-200 pb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div><h2 class="text-base md:text-xl font-black uppercase text-slate-950 tracking-tight">Administrative Telemetry Console</h2><p class="text-[10px] font-mono text-red-500 font-bold uppercase">Root Clearing House Matrix Interface Enforced.</p></div>
-            <div class="flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-xl border text-[11px] md:text-xs font-bold w-full lg:w-auto">
-              <button onclick="executeAdminTabNavigation('users')" id="ab-users" class="flex-1 lg:flex-none text-center px-3 py-1.5 rounded-lg transition">Users</button>
-              <button onclick="executeAdminTabNavigation('deals')" id="ab-deals" class="flex-1 lg:flex-none text-center px-3 py-1.5 rounded-lg transition">Packages</button>
-              <button onclick="executeAdminTabNavigation('quotas')" id="ab-quotas" class="flex-1 lg:flex-none text-center px-3 py-1.5 rounded-lg transition">Claims</button>
-              <button onclick="executeAdminTabNavigation('dealreqs')" id="ab-dealreqs" class="flex-1 lg:flex-none text-center px-3 py-1.5 rounded-lg transition">Orders</button>
-            </div>
-          </div>
-          <div id="admin-tab-viewport" class="min-h-[300px]"></div>
-        </div>`;
+    function renderDashboardWorkspaceLayout() {
+      document.getElementById("authView").classList.add("hidden");
+      document.getElementById("dashboardView").classList.remove("hidden");
+      document.getElementById("logoutBtn").classList.remove("hidden");
+      
+      const badge = document.getElementById("userSessionBadge");
+      badge.textContent = `ID: ${sysState.profile.id} [${sysState.profile.name}]`;
+      badge.classList.remove("hidden");
+
+      // Balance parameters structural views rendering
+      document.getElementById("quotaPostVal").textContent = sysState.profile.assigned_post_quota;
+      document.getElementById("quotaRefreshVal").textContent = sysState.profile.assigned_refresh_quota;
+      document.getElementById("accountRoleVal").textContent = sysState.profile.role;
+
+      fetchAgentCatalogListingsCollection();
     }
 
-    async function executeAdminTabNavigation(tab) {
-      state.activeAdminTab = tab;
-      const target = document.getElementById('admin-tab-viewport'); if(!target) return;
-      ['users','deals','quotas','dealreqs'].forEach(t => {
-        const b = document.getElementById(`ab-${t}`); if(b) b.className = (t===tab)?"flex-1 lg:flex-none text-center px-3 py-1.5 bg-white shadow-sm border rounded-lg text-slate-950 font-black":"flex-1 lg:flex-none text-center px-3 py-1.5 text-slate-500 hover:text-slate-950 rounded-lg";
+    async function fetchAgentCatalogListingsCollection() {
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=posts&method=GET&token=${sysState.token}`);
+        const result = await response.json();
+        if (result.success) {
+          sysState.listings = result.data;
+          renderListingsCatalogFeedItemsGrid();
+        }
+      } catch (err) {
+        console.error("Internal collection synchronization process context trace fault vectors mapping exception.");
+      }
+    }
+
+    function renderListingsCatalogFeedItemsGrid() {
+      const container = document.getElementById("postsContainer");
+      container.innerHTML = "";
+
+      if(sysState.listings.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-sm text-slate-400 font-medium tracking-wide">No catalog database asset index entries located record tracking indices null.</div>`;
+        return;
+      }
+
+      sysState.listings.forEach(p => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "p-4 border border-slate-100 rounded-xl bg-slate-50/50 hover:bg-slate-50 flex justify-between items-start flex-wrap gap-4 transition shadow-xs";
+        
+        // Badging contextual formatting configurations visualization logic check
+        let badgeColor = "bg-slate-100 text-slate-600";
+        if(p.refresh_level === "Hot") badgeColor = "bg-amber-100 text-amber-700 font-semibold";
+        if(p.refresh_level === "Super Hot") badgeColor = "bg-orange-100 text-orange-700 font-bold";
+        if(p.refresh_level === "Titanium") badgeColor = "bg-indigo-100 text-indigo-700 font-extrabold ring-1 ring-indigo-300";
+
+        wrapper.innerHTML = `
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2 flex-wrap gap-1">
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">${p.id}</span>
+              <span class="text-xs font-medium px-2 py-0.5 rounded ${badgeColor}">${p.refresh_level || 'Standard'}</span>
+              <span class="text-xs font-bold text-emerald-600 font-mono">${Number(p.price).toLocaleString()} PKR</span>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm">${p.title}</h4>
+            <p class="text-xs text-slate-400 font-medium">${p.location} | ${p.area} ${p.area_unit} | Beds: ${p.bedrooms} | Baths: ${p.bathrooms}</p>
+            <p class="text-[11px] text-slate-400 font-mono">Created: ${new Date(p.created_at).toLocaleDateString()}</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <select id="boostTier-${p.id}" class="text-xs border px-2 py-1 rounded bg-white font-medium focus:outline-none">
+              <option value="Hot">Hot (2 pts)</option>
+              <option value="Super Hot">Super Hot (3 pts)</option>
+              <option value="Titanium">Titanium (5 pts)</option>
+            </select>
+            <button onclick="commitListingRefreshActionRequest('${p.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1 rounded-lg transition shadow-xs cursor-pointer">Refresh</button>
+            <button onclick="triggerListingDeletionPipeline('${p.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs px-2 py-1 rounded-lg transition border border-rose-200/40 cursor-pointer">✕</button>
+          </div>
+        `;
+        container.appendChild(wrapper);
       });
-      target.innerHTML = `<div class="text-center py-12 font-mono text-xs text-indigo-600 animate-pulse">Re-indexing relational data matrices records layers...</div>`;
+    }
 
-      if(tab === 'users') {
-        const u = await apiCall('admin-users', 'GET');
-        if(u) {
-          let rows = '';
-          u.forEach(user => {
-            rows += `
-              <tr class="text-xs border-b border-slate-100 hover:bg-slate-50/60 font-medium">
-                <td class="px-4 py-3 font-mono font-bold text-slate-400">${user.id}</td>
-                <td class="px-4 py-3 text-slate-950 font-black">${user.name} <div class="text-[10px] text-slate-400 font-normal font-mono mt-0.5">${user.email}</div></td>
-                <td class="px-4 py-3 uppercase"><span class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-[10px] font-bold">${user.role}</span></td>
-                <td class="px-4 py-3 font-mono font-bold text-slate-600">${user.assigned_post_quota} P</td>
-                <td class="px-4 py-3 font-mono font-bold text-slate-600">${user.assigned_refresh_quota} R</td>
-                <td class="px-4 py-3 text-right"><button onclick="triggerOverrideModalLauncher('${user.id}',${user.assigned_post_quota},${user.assigned_refresh_quota})" class="bg-slate-950 text-white font-bold text-[10px] px-2.5 py-1 rounded hover:bg-slate-800 transition shadow-sm">Override</button></td>
-              </tr>`;
-          });
-          target.innerHTML = `<div class="bg-white border rounded-xl overflow-x-auto shadow-sm"><table class="w-full text-left border-collapse min-w-[600px]"><thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100"><tr><th class="px-4 py-3">UID</th><th class="px-4 py-3">Identity Context</th><th class="px-4 py-3">Access Auth</th><th class="px-4 py-3">Post Quota</th><th class="px-4 py-3">Refresh Points</th><th class="px-4 py-3 text-right">Actions Matrix</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    async function handleListingCreationPipelineCommit(e) {
+      e.preventDefault();
+      clearMessage();
+
+      const payload = {
+        title: document.getElementById("pTitle").value.trim(),
+        property_type: document.getElementById("pType").value,
+        purpose: document.getElementById("pPurpose").value,
+        price: Number(document.getElementById("pPrice").value),
+        area: Number(document.getElementById("pArea").value),
+        area_unit: document.getElementById("pUnit").value,
+        bedrooms: Number(document.getElementById("pBeds").value),
+        bathrooms: Number(document.getElementById("pBaths").value),
+        location: document.getElementById("pLocation").value.trim(),
+        contact_number: document.getElementById("pContact").value.trim(),
+        token: sysState.token
+      };
+
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=posts&method=POST`, {
+          method: "POST",
+          mode: "cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          document.getElementById("postForm").reset();
+          await evaluateGlobalApplicationStateRoute(); // Refresh profile values dynamic tracking indicators counters parameters context balances
+          displayMessage("Catalog deployment structural asset allocation post trace execution complete.", true);
+        } else {
+          displayMessage(result.error || "Execution error posting structural unit.");
         }
-      }
-      else if(tab === 'deals') {
-        const d = await apiCall('deal', 'GET');
-        if(d) {
-          let rows = '';
-          d.forEach(deal => {
-            rows += `
-              <tr class="text-xs border-b border-slate-100 hover:bg-slate-50/60 font-medium">
-                <td class="px-4 py-3 font-mono font-bold text-slate-400">${deal.id}</td>
-                <td class="px-4 py-3 font-black text-slate-950">${deal.title} <div class="text-[10px] text-slate-400 font-normal font-sans mt-0.5">${deal.description}</div></td>
-                <td class="px-4 py-3 font-mono text-slate-600">+${deal.post_quota} P / +${deal.refresh_quota} R</td>
-                <td class="px-4 py-3 font-bold text-slate-900">PKR ${Number(deal.price).toLocaleString()}</td>
-                <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${deal.active===true||deal.active==='true'?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}">${deal.active}</span></td>
-                <td class="px-4 py-3 text-right"><button onclick="executeDealStateShift('${deal.id}', ${deal.active===true||deal.active==='true'?'false':'true'})" class="text-[10px] font-bold border px-2.5 py-1 bg-white rounded shadow-sm hover:bg-slate-50 transition">${deal.active===true||deal.active==='true'?'Deactivate':'Activate'}</button></td>
-              </tr>`;
-          });
-          target.innerHTML = `
-            <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2"><h3 class="text-xs font-black uppercase text-slate-400 tracking-wider">Product Inclusions Master Array</h3><button onclick="launchCreateDealStructureModal()" class="w-full sm:w-auto bg-indigo-600 text-white font-bold text-xs px-3 py-2 rounded-xl hover:bg-indigo-700 transition shadow-sm">+ Provision Package</button></div>
-            <div class="bg-white border rounded-xl overflow-x-auto shadow-sm"><table class="w-full text-left border-collapse min-w-[650px]"><thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Title Details</th><th class="px-4 py-3">Quota Multipliers</th><th class="px-4 py-3">Financial Price</th><th class="px-4 py-3">State</th><th class="px-4 py-3 text-right">Toggle</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-        }
-      }
-      else if(tab === 'quotas') {
-        const q = await apiCall('quota-request', 'GET');
-        if(q) {
-          let rows = '';
-          q.forEach(req => {
-            rows += `
-              <tr class="text-xs border-b border-slate-100 font-medium hover:bg-slate-50/40">
-                <td class="px-4 py-3 font-mono font-bold text-slate-400">${req.id}</td>
-                <td class="px-4 py-3 font-mono text-slate-600">${req.user_id}</td>
-                <td class="px-4 py-3 font-bold text-slate-900">+${req.requested_posts} P / +${req.requested_refresh} R</td>
-                <td class="px-4 py-3"><span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${req.status==='pending'?'bg-amber-50 text-amber-700':req.status==='accepted'?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}">${req.status}</span></td>
-                <td class="px-4 py-3 italic text-slate-400 max-w-[150px] truncate">${req.admin_note || '&mdash;'}</td>
-                <td class="px-4 py-3 text-right">${req.status==='pending'?`<button onclick="launchAuditClearingModal('quota','${req.id}')" class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded hover:bg-indigo-700 transition shadow-sm">Audit</button>`:`<span class="text-slate-300 italic text-[11px]">Locked</span>`}</td>
-              </tr>`;
-          });
-          target.innerHTML = `<div class="bg-white border rounded-xl overflow-x-auto shadow-sm"><table class="w-full text-left border-collapse min-w-[650px]"><thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100"><tr><th class="px-4 py-3">Claim ID</th><th class="px-4 py-3">User Context</th><th class="px-4 py-3">Payload Increment</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Remarks Log</th><th class="px-4 py-3 text-right">Directives</th></tr></thead><tbody>${rows?rows:'<tr><td colspan="6" class="text-center py-6 text-slate-400 font-mono">Claims registers are empty.</td></tr>'}</tbody></table></div>`;
-        }
-      }
-      else if(tab === 'dealreqs') {
-        const dr = await apiCall('deal-request', 'GET');
-        if(dr) {
-          let rows = '';
-          dr.forEach(req => {
-            rows += `
-              <tr class="text-xs border-b border-slate-100 font-medium hover:bg-slate-50/40">
-                <td class="px-4 py-3 font-mono font-bold text-slate-400">${req.id}</td>
-                <td class="px-4 py-3 font-mono text-slate-900 font-bold">${req.deal_id}</td>
-                <td class="px-4 py-3 font-mono text-slate-600">${req.user_id}</td>
-                <td class="px-4 py-3"><span class="px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${req.status==='pending'?'bg-amber-50 text-amber-700':req.status==='accepted'?'bg-green-50 text-green-700':'bg-red-50 text-red-700'}">${req.status}</span></td>
-                <td class="px-4 py-3 italic text-slate-400 max-w-[150px] truncate">${req.admin_note || '&mdash;'}</td>
-                <td class="px-4 py-3 text-right">${req.status==='pending'?`<button onclick="launchAuditClearingModal('deal','${req.id}')" class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded hover:bg-indigo-700 transition shadow-sm">Audit</button>`:`<span class="text-slate-300 italic text-[11px]">Locked</span>`}</td>
-              </tr>`;
-          });
-          target.innerHTML = `<div class="bg-white border rounded-xl overflow-x-auto shadow-sm"><table class="w-full text-left border-collapse min-w-[650px]"><thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100"><tr><th class="px-4 py-3">Transaction ID</th><th class="px-4 py-3">Target Bundle</th><th class="px-4 py-3">Applicant User</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Remarks Log</th><th class="px-4 py-3 text-right">Directives</th></tr></thead><tbody>${rows?rows:'<tr><td colspan="6" class="text-center py-6 text-slate-400 font-mono">Order purchase pipeline entries empty.</td></tr>'}</tbody></table></div>`;
-        }
+      } catch (err) {
+        displayMessage("Fatal operational tracking system exception boundaries pipeline mismatch data parsing.");
       }
     }
 
-    // =========================================================================
-    // MODAL DIALOGS ADMIN ASSIGNMENT INTERACTIVE INJECTION LAYERS
-    // =========================================================================
-    function triggerOverrideModalLauncher(uid, cp, cr) {
-      const h = `
-        <div id="modal-mount" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[200]">
-          <div class="bg-white rounded-2xl max-w-sm w-full p-5 sm:p-6 border shadow-2xl text-xs space-y-4">
-            <div><h4 class="text-sm font-black uppercase text-slate-900">Direct Force Quota Assignment Override</h4><p class="text-slate-400 font-mono text-[10px] mt-0.5">Target Context Node: ${uid}</p></div>
-            <div class="space-y-3">
-              <div><label class="block font-bold text-slate-600 mb-1">Absolute Allocation Post Capacity</label><input type="number" id="mo-p" value="${cp}" class="w-full px-3 py-2 border rounded-lg bg-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></div>
-              <div><label class="block font-bold text-slate-600 mb-1">Absolute Allocation Refresh Token Count</label><input type="number" id="mo-r" value="${cr}" class="w-full px-3 py-2 border rounded-lg bg-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></div>
-            </div>
-            <div class="flex justify-end space-x-1.5 font-bold pt-1"><button onclick="document.getElementById('modal-container').remove()" class="px-3 py-2 border rounded-lg text-slate-500 hover:bg-slate-50 transition">Cancel</button><button onclick="executeForcedOverrideMutation('${uid}')" class="px-4 py-2 bg-slate-950 text-white rounded-lg hover:bg-slate-800 transition">Apply Forces</button></div>
-          </div>
-        </div>`;
-      const d = document.createElement('div'); d.id='modal-container'; d.innerHTML=h; document.body.appendChild(d);
+    async function commitListingRefreshActionRequest(postId) {
+      clearMessage();
+      const selectedTier = document.getElementById(`boostTier-${postId}`).value;
+      const payload = {
+        post_id: postId,
+        refresh_level: selectedTier,
+        token: sysState.token
+      };
+
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=refresh-post&method=POST`, {
+          method: "POST",
+          mode: "cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if(result.success) {
+          await evaluateGlobalApplicationStateRoute();
+          displayMessage(`Listing manual refresh level boost sequence applied successfully to target node: ${postId}`, true);
+        } else {
+          displayMessage(result.error || "Boost assignment execution mismatch transaction parameter failure.");
+        }
+      } catch (err) {
+        displayMessage("Network transport transmission routing processing verification fault.");
+      }
     }
 
-    async function executeForcedOverrideMutation(uid) {
-      const p = document.getElementById('mo-p').value; const r = document.getElementById('mo-r').value;
-      if(await apiCall('assign-quota', 'POST', { user_id: uid, post_quota: p, refresh_quota: r })) { document.getElementById('modal-container').remove(); executeAdminTabNavigation('users'); }
+    async function triggerListingDeletionPipeline(postId) {
+      if(!confirm("Are you certain you wish to flag this asset row visibility parameter matrix to archived state offline?")) return;
+      clearMessage();
+
+      try {
+        const response = await fetch(`${SCRIPT_URL}?action=posts&method=DELETE&id=${postId}&token=${sysState.token}`, {
+          method: "POST" // CORS handling compatibility bypass wrapper protocol target mapping node rule
+        });
+        const result = await response.json();
+
+        if(result.success) {
+          await evaluateGlobalApplicationStateRoute();
+          displayMessage(`Listing row identity entry ${postId} flagged archived offline successfully context parameter pipeline.`, true);
+        } else {
+          displayMessage(result.error || "Access management visibility modification validation error.");
+        }
+      } catch (err) {
+        displayMessage("Data channel streaming verification trace fault error processing.");
+      }
     }
 
-    function launchCreateDealStructureModal() {
-      const h = `
-        <div id="modal-mount" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[200]">
-          <div class="bg-white rounded-2xl max-w-sm w-full p-5 sm:p-6 border shadow-2xl text-xs space-y-3">
-            <h4 class="text-sm font-black uppercase text-slate-900 mb-2">Provision Commercial Bundle Product</h4>
-            <div><label class="block font-bold text-slate-600 mb-1">Package Title Display Label *</label><input type="text" id="md-title" placeholder="Premium Starter Pack" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></div>
-            <div><label class="block font-bold text-slate-600 mb-1">Marketing Description Summary</label><input type="text" id="md-desc" placeholder="Details..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></div>
-            <div class="grid grid-cols-2 gap-2">
-              <div><label class="block font-bold text-slate-600 mb-1">Post Allocation *</label><input type="number" id="md-post" value="10" class="w-full px-3 py-2 border rounded-lg focus:outline-none"></div>
-              <div><label class="block font-bold text-slate-600 mb-1">Refresh Tokens *</label><input type="number" id="md-ref" value="20" class="w-full px-3 py-2 border rounded-lg focus:outline-none"></div>
-            </div>
-            <div><label class="block font-bold text-slate-600 mb-1">Financial Cost Price (PKR) *</label><input type="number" id="md-price" value="5000" class="w-full px-3 py-2 border rounded-lg focus:outline-none"></div>
-            <div class="flex justify-end space-x-1.5 font-bold pt-2"><button onclick="document.getElementById('modal-container').remove()" class="px-3 py-2 border rounded-lg text-slate-500 hover:bg-slate-50 transition">Cancel</button><button onclick="executeDealProductCreation()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg uppercase tracking-wide hover:bg-indigo-700 transition">Commit Row</button></div>
-          </div>
-        </div>`;
-      const d = document.createElement('div'); d.id='modal-container'; d.innerHTML=h; document.body.appendChild(d);
+    function triggerSystemSessionTeardownClearance() {
+      localStorage.removeItem("z_system_auth_token");
+      sysState.token = null;
+      sysState.profile = null;
+      sysState.listings = [];
+      clearMessage();
+      evaluateGlobalApplicationStateRoute();
     }
-
-    async function executeDealProductCreation() {
-      const payload = { title: document.getElementById('md-title').value, description: document.getElementById('md-desc').value, post_quota: document.getElementById('md-post').value, refresh_quota: document.getElementById('md-ref').value, price: document.getElementById('md-price').value };
-      if(await apiCall('deal', 'POST', payload)) { document.getElementById('modal-container').remove(); executeAdminTabNavigation('deals'); }
-    }
-
-    async function executeDealStateShift(id, targetState) {
-      if(await apiCall('deal', 'PUT', { active: targetState }, id)) executeAdminTabNavigation('deals');
-    }
-
-    function launchAuditClearingModal(type, targetReqId) {
-      const h = `
-        <div id="modal-mount" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[200]">
-          <div class="bg-white rounded-2xl max-w-sm w-full p-5 sm:p-6 border shadow-2xl text-xs space-y-4">
-            <div><h4 class="text-sm font-black uppercase text-slate-900">Resolve Authorization Decision Case</h4><p class="text-slate-400 font-mono text-[10px] mt-0.5">Record Index Ref: ${targetReqId}</p></div>
-            <div><label class="block font-bold text-slate-600 mb-1">Action Status Decision *</label><select id="ma-status" class="w-full px-3 py-2 border rounded-lg bg-white font-bold focus:outline-none"><option value="accepted">accepted — Approve and Top Up Balance</option><option value="rejected">rejected — Revoke Pipeline Request</option></select></div>
-            <div><label class="block font-bold text-slate-600 mb-1">Auditor Remarks Notes</label><input type="text" id="ma-note" placeholder="Justification log notes..." class="w-full px-3 py-2 border rounded-lg focus:outline-none"></div>
-            <div class="flex justify-end space-x-1.5 font-bold pt-1"><button onclick="document.getElementById('modal-container').remove()" class="px-3 py-2 border rounded-lg text-slate-500 hover:bg-slate-50 transition">Cancel</button><button onclick="executeAuditResolutionCommit('${type}','${targetReqId}')" class="px-4 py-2 bg-indigo-600 text-white rounded-lg uppercase tracking-wider hover:bg-indigo-700 transition">Commit Decision</button></div>
-          </div>
-        </div>`;
-      const d = document.createElement('div'); d.id='modal-container'; d.innerHTML=h; document.body.appendChild(d);
-    }
-
-    async function executeAuditResolutionCommit(type, id) {
-      const status = document.getElementById('ma-status').value; const note = document.getElementById('ma-note').value;
-      const targetAction = type === 'quota' ? 'quota-request' : 'deal-request';
-      if(await apiCall(targetAction, 'PUT', { status: status, admin_note: note }, id)) { document.getElementById('modal-container').remove(); executeAdminTabNavigation(type==='quota'?'quotas':'dealreqs'); }
-    }
-
-    // =========================================================================
-    // DYNAMIC BOOTSTRAP APP FLOW ENTRY MATRIX RUNNER
-    // =========================================================================
-    navigate('portal-home');
   </script>
 </body>
 </html>
