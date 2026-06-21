@@ -50,7 +50,6 @@
             generateVisitorId();
             if (state.token) {
                 await syncSessionState();
-                // FIX: If token is still valid after sync, set view to dashboard
                 if (state.token) {
                     state.currentView = "dashboard";
                 }
@@ -65,6 +64,7 @@
         }
 
         async function syncSessionState() {
+            if (!state.token) return;
             try {
                 let res = await fetch(`${API_URL}?action=profile&token=${state.token}`);
                 let json = await res.json();
@@ -183,7 +183,7 @@
         function renderCards(items) {
             const grid = document.getElementById("portal-listings-grid");
             const counter = document.getElementById("result-counter");
-            counter.innerText = `${items.length} records populated`;
+            if (counter) counter.innerText = `${items.length} records populated`;
             
             if (items.length === 0) {
                 grid.innerHTML = `<div class="p-12 text-slate-400 text-center col-span-3">No active properties match parameters.</div>`;
@@ -279,13 +279,15 @@
                 });
                 let json = await res.json();
                 if (json.success) {
-                    localStorage.setItem("token", json.token);
-                    localStorage.setItem("role", json.role);
-                    localStorage.setItem("name", json.name);
+                    // FIX: State parameters ko synchronous mapping ke mutabiq pehle assign karna zaroori hai
                     state.token = json.token;
                     state.role = json.role;
                     
-                    // Sync profile data to populate complete state objects before navigation
+                    localStorage.setItem("token", json.token);
+                    localStorage.setItem("role", json.role);
+                    localStorage.setItem("name", json.name);
+                    
+                    // Profile details sync karein bina context crash kiye
                     await syncSessionState();
                     navigateTo("dashboard");
                 } else {
@@ -460,7 +462,6 @@
                 let res = await fetch(`${API_URL}?action=dashboard&token=${state.token}`);
                 let json = await res.json();
                 
-                // FIX: Fallback check in case backend data is temporarily unauthorized/empty without wiping user token instantly
                 if (!json.success) { 
                     target.innerHTML = `<div class="p-8 text-center"><p class="text-red-500 font-medium mb-4">Dashboard pipeline access rejected: ${json.error || 'Unauthorized context'}</p><button onclick="forceLogout()" class="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg uppercase">Return to Safety</button></div>`;
                     return; 
